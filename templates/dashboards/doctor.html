@@ -1,0 +1,20 @@
+<body class="container mt-5">
+    <div class="d-flex justify-content-between">
+        <h2>Doctor Dashboard - Pending Cases</h2>
+        <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+    </div>
+    <hr>
+
+    <div class="list-group">
+        {% for report in reports %}
+        <div class="list-group-item">
+            <h5>Animal: {{ report.animal.tag_id }} ({{ report.animal.breed }})</h5>
+            <p><strong>Farmer's Note:</strong> {{ report.farmer_note }}</p>
+            <p><small>Reported on: {{ report.created_at }}</small></p>
+            <button class="btn btn-success btn-sm">Give Prescription</button>
+        </div>
+        {% empty %}
+        <p>No pending health reports.</p>
+        {% endfor %}
+    </div>
+</body>

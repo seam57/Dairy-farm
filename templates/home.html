@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Livestock Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark px-4">
+        <a class="navbar-brand" href="#">Livestock Management</a>
+        <div class="text-white">
+            {% if user.is_authenticated %}
+                Welcome, <b>{{ user.username }}</b> ({{ user.get_role_display }})
+                <a href="/logout/" class="btn btn-outline-danger btn-sm ms-3">Logout</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        {% if user.is_authenticated %}
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card text-white bg-success mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">User Profile</h5>
+                            <p>Role: {{ user.get_role_display }}</p>
+                            <p>Phone: {{ user.phone|default:"Not Provided" }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="p-5 mb-4 bg-light rounded-3 border">
+                        <h2>Hello {{ user.username }}!</h2>
+                        <p>This is your Livestock Management dashboard. Start managing your farm today.</p>
+                        <button class="btn btn-primary">Go to Services</button>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="text-center p-5 border rounded shadow-sm bg-white">
+                <h1>Manage Your Livestock Better</h1>
+                <p class="lead">Join our platform as a Farmer, Doctor, or Manager.</p>
+                <a href="/register/" class="btn btn-success btn-lg">Get Started</a>
+                <a href="/login/" class="btn btn-outline-primary btn-lg ms-2">Login</a>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

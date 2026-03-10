@@ -1,0 +1,12 @@
+<body class="container mt-5">
+    <h3>Report Problem for {{ animal.tag_id }}</h3>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label>Describe the problem (e.g., Milk production decreased):</label>
+            <textarea name="note" class="form-control" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Send to Doctor</button>
+        <a href="{% url 'farmer_dashboard' %}" class="btn btn-secondary">Back</a>
+    </form>
+</body>
