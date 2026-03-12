@@ -2,136 +2,72 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farmer Dashboard | Livestock MS</title>
+    <title>Farmer Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary-color: #2e7d32; --secondary-color: #f8f9fa; }
-        body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .navbar { background-color: var(--primary-color) !important; color: white; }
-        .profile-card { border-radius: 15px; border: none; background: white; transition: 0.3s; }
-        .profile-header { background: linear-gradient(45deg, #2e7d32, #4caf50); color: white; border-radius: 15px 15px 0 0; padding: 20px; }
-        .stat-card { border-radius: 12px; border: none; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .btn-action { border-radius: 8px; font-weight: 500; transition: 0.3s; }
-        .table-container { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .animal-icon { font-size: 2rem; color: var(--primary-color); }
+        body { font-family: 'Poppins', sans-serif; background: #f8f9fa; }
+        .navbar { background: linear-gradient(45deg, #11998e, #38ef7d) !important; }
+        .card { border-radius: 15px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .btn-custom { background: linear-gradient(45deg, #11998e, #38ef7d); border: none; color: white; }
     </style>
 </head>
 <body>
+    <nav class="navbar navbar-dark p-3 shadow">
+        <div class="container-fluid">
+            <span class="navbar-brand fw-bold"><i class="fas fa-cow"></i> Livestock Manager</span>
+            <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
+        </div>
+    </nav>
 
-<nav class="navbar navbar-dark shadow-sm mb-4">
-    <div class="container">
-        <a class="navbar-brand" href="#"><i class="fas fa-tractor me-2"></i> Livestock Management</a>
-        <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm"><i class="fas fa-sign-out-alt"></i> Logout</a>
-    </div>
-</nav>
-
-<div class="container">
-    <div class="row g-4">
-        <div class="col-lg-4">
-            <div class="card profile-card shadow-sm">
-                <div class="profile-header text-center">
-                    <div class="mb-3">
-                        <i class="fas fa-user-circle fa-4x"></i>
-                    </div>
-                    <h4>Hello, {{ request.user.username }}!</h4>
-                    <span class="badge bg-light text-success fw-bold">Active Session</span>
-                </div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-user-tag me-2 text-muted"></i> Role:</span>
-                            <span class="fw-bold text-success">{{ profile.get_role_display|default:"Farmer" }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-phone me-2 text-muted"></i> Phone:</span>
-                            <span class="text-muted">{{ profile.phone|default:"Not Provided" }}</span>
-                        </li>
-                    </ul>
-                    <div class="mt-4 d-grid">
-                        <button class="btn btn-success btn-action"><i class="fas fa-edit me-2"></i> Update Profile</button>
-                    </div>
-                </div>
-            </div>
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between mb-4">
+            <h2 style="color: #11998e;">Farmer Dashboard</h2>
+            <button class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#addModal">Add Animal</button>
         </div>
 
-        <div class="col-lg-8">
-            <div class="card stat-card p-4 mb-4 bg-white border-start border-success border-5">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h2 class="fw-bold">Farm Dashboard</h2>
-                        <p class="text-muted mb-0">Manage your livestock and track daily production.</p>
+        <div class="row">
+            <div class="col-md-8">
+                <div class="row">
+                    {% for animal in animals %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card p-3">
+                            <h5 class="fw-bold"><i class="fas fa-tag"></i> {{ animal.tag_id }}</h5>
+                            <p class="text-muted small">{{ animal.breed }} | {{ animal.age }} Yrs</p>
+                            <a href="{% url 'report_problem' animal.id %}" class="btn btn-sm btn-outline-danger w-100">Report Problem</a>
+                        </div>
                     </div>
-                    <i class="fas fa-cow animal-icon"></i>
+                    {% endfor %}
                 </div>
             </div>
-
-            <div class="row g-3 mb-4 text-center">
-                <div class="col-md-4">
-                    <div class="card stat-card p-3 bg-white">
-                        <h6 class="text-muted">Total Animals</h6>
-                        <h3 class="fw-bold text-primary">{{ animals.count }}</h3>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card stat-card p-3 bg-white">
-                        <h6 class="text-muted">Health Reports</h6>
-                        <h3 class="fw-bold text-warning">0</h3>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card stat-card p-3 bg-white">
-                        <h6 class="text-muted">Milk Today (L)</h6>
-                        <h3 class="fw-bold text-success">--</h3>
-                    </div>
-                </div>
-            </div>
-
-            <div class="table-container">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-bold m-0"><i class="fas fa-list me-2"></i> My Livestock List</h5>
-                    <button class="btn btn-primary btn-sm btn-action"><i class="fas fa-plus me-1"></i> Add New</button>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Tag ID</th>
-                                <th>Breed</th>
-                                <th>Status</th>
-                                <th class="text-end">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for animal in animals %}
-                            <tr>
-                                <td><span class="fw-bold">#{{ animal.tag_id }}</span></td>
-                                <td>{{ animal.breed }}</td>
-                                <td><span class="badge rounded-pill bg-success-subtle text-success border border-success">Healthy</span></td>
-                                <td class="text-end">
-                                    <a href="{% url 'report_problem' animal.id %}" class="btn btn-outline-danger btn-sm">
-                                        <i class="fas fa-hand-holding-medical me-1"></i> Inform Doctor
-                                    </a>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="4" class="text-center py-5">
-                                    <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
-                                    <p class="text-muted">No animals added yet.</p>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+            <div class="col-md-4">
+                <div class="card p-3">
+                    <h5 class="mb-3">Doctor Advice</h5>
+                    {% for con in consultations %}
+                        <div class="border-bottom mb-2 pb-2">
+                            <small class="fw-bold text-success">{{ con.animal.tag_id }}</small>
+                            <p class="small m-0">{{ con.symptoms|truncatechars:30 }}</p>
+                            <span class="badge bg-warning text-dark small">{{ con.status }}</span>
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="modal fade" id="addModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form class="modal-content p-3" method="POST">
+                {% csrf_token %}
+                <input type="text" name="tag_id" placeholder="Tag ID" class="form-control mb-2" required>
+                <input type="text" name="breed" placeholder="Breed" class="form-control mb-2" required>
+                <input type="number" name="age" placeholder="Age" class="form-control mb-2" required>
+                <input type="number" step="0.1" name="weight" placeholder="Weight" class="form-control mb-2" required>
+                <input type="hidden" name="add_animal" value="1">
+                <button type="submit" class="btn btn-custom w-100">Save Animal</button>
+            </form>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
