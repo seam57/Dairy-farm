@@ -1,16 +1,78 @@
-<body class="container mt-5">
-    <div class="card p-4 shadow-sm">
-        <h3 class="text-danger mb-4"><i class="fas fa-exclamation-triangle"></i> Report Problem for {{ animal.tag_id }}</h3>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Health Problem | DairyFarm</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .report-card {
+            max-width: 650px;
+            margin: 50px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+        .animal-summary {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 5px solid #d9534f;
+        }
+        .tag-badge { background: #d9534f; color: white; padding: 4px 12px; border-radius: 50px; font-weight: 600; }
+        .btn-submit { background: #11998e; border: none; padding: 12px; font-weight: 600; transition: 0.3s; }
+        .btn-submit:hover { background: #0e847a; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="report-card">
+        <div class="text-center mb-4">
+            <i class="fas fa-file-medical fa-3x text-danger mb-3"></i>
+            <h2 class="fw-bold">Report Animal Health Issue</h2>
+            <p class="text-muted">বিস্তারিত সমস্যাটি লিখুন যাতে ডাক্তার সঠিক পরামর্শ দিতে পারেন।</p>
+        </div>
+
+        <div class="animal-summary">
+            <div class="row align-items-center">
+                <div class="col-md-7">
+                    <h5 class="mb-1 fw-bold">ID: <span class="tag-badge">#{{ animal.tag_id }}</span></h5>
+                    <p class="mb-0 text-muted"><strong>Type:</strong> {{ animal.get_category_display }} | <strong>Breed:</strong> {{ animal.breed }}</p>
+                </div>
+                <div class="col-md-5 text-md-end mt-2 mt-md-0">
+                    <span class="text-muted small"><i class="fas fa-clock me-1"></i> Reporting Now</span>
+                </div>
+            </div>
+        </div>
+
         <form method="POST">
             {% csrf_token %}
-            <div class="mb-3">
-                <label class="form-label fw-bold">Describe the symptoms or problem:</label>
-                <textarea name="symptoms" class="form-control" rows="4" placeholder="e.g. Fever, not eating, or milk production decreased..." required></textarea>
+            <div class="mb-4">
+                <label class="form-label fw-bold text-dark">লক্ষণগুলো কি কি? (Describe Symptoms)</label>
+                <textarea name="symptoms" class="form-control" rows="6" 
+                    placeholder="পশুর আচরণে কি কি পরিবর্তন দেখছেন বা কি কি সমস্যা হচ্ছে তা এখানে লিখুন..." required></textarea>
+                <div class="form-text mt-2">
+                    <i class="fas fa-info-circle me-1"></i> আপনার এই রিপোর্টটি সরাসরি ডাক্তারের ড্যাশবোর্ডে চলে যাবে।
+                </div>
             </div>
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Send to Doctor</button>
-                <a href="{% url 'farmer_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-submit text-white">
+                    <i class="fas fa-paper-plane me-2"></i> Submit Report to Doctor
+                </button>
+                <a href="{% url 'farmer_dashboard' %}" class="btn btn-outline-secondary py-2">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                </a>
             </div>
         </form>
     </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+</html>

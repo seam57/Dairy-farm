@@ -2,72 +2,203 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Farmer Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Dashboard | DairyFarm</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Poppins', sans-serif; background: #f8f9fa; }
-        .navbar { background: linear-gradient(45deg, #11998e, #38ef7d) !important; }
-        .card { border-radius: 15px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .btn-custom { background: linear-gradient(45deg, #11998e, #38ef7d); border: none; color: white; }
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .sidebar { background: #11998e; min-height: 100vh; color: white; position: fixed; width: 250px; z-index: 1000; }
+        .nav-link { color: white; opacity: 0.8; padding: 12px 20px; transition: 0.3s; }
+        .nav-link:hover, .nav-link.active { opacity: 1; background: rgba(255,255,255,0.2); border-radius: 10px; margin: 0 10px; }
+        .main-content { margin-left: 250px; padding: 30px; width: calc(100% - 250px); }
+        .table-card { border-radius: 20px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.05); background: white; padding: 25px; }
+        .icon-box { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .badge-id { background: #f8f9fa; color: #11998e; font-weight: 700; border: 1px solid #dee2e6; padding: 6px 12px; border-radius: 8px; }
+        .table thead th { border: none; color: #6c757d; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-dark p-3 shadow">
-        <div class="container-fluid">
-            <span class="navbar-brand fw-bold"><i class="fas fa-cow"></i> Livestock Manager</span>
-            <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
-        </div>
-    </nav>
 
-    <div class="container mt-5">
-        <div class="d-flex justify-content-between mb-4">
-            <h2 style="color: #11998e;">Farmer Dashboard</h2>
-            <button class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#addModal">Add Animal</button>
+<div class="container-fluid p-0">
+    <div class="d-flex">
+        <div class="sidebar d-none d-md-block">
+            <div class="p-4 text-center">
+                <h3 class="fw-bold m-0 text-white">DairyFarm</h3>
+                <small class="opacity-75">Farmer Panel</small>
+            </div>
+            <nav class="nav flex-column mt-4">
+                <a href="{% url 'profile_view' %}" class="nav-link mb-2">
+                    <i class="fas fa-user-circle me-3"></i>Profile
+                </a>
+                <a href="{% url 'farmer_dashboard' %}" class="nav-link active mb-2">
+                    <i class="fas fa-th-large me-3"></i>Dashboard
+                </a>
+                <a href="{% url 'logout' %}" class="nav-link text-warning mt-5">
+                    <i class="fas fa-sign-out-alt me-3"></i>Logout
+                </a>
+            </nav>
         </div>
 
-        <div class="row">
-            <div class="col-md-8">
-                <div class="row">
-                    {% for animal in animals %}
-                    <div class="col-md-6 mb-4">
-                        <div class="card p-3">
-                            <h5 class="fw-bold"><i class="fas fa-tag"></i> {{ animal.tag_id }}</h5>
-                            <p class="text-muted small">{{ animal.breed }} | {{ animal.age }} Yrs</p>
-                            <a href="{% url 'report_problem' animal.id %}" class="btn btn-sm btn-outline-danger w-100">Report Problem</a>
+        <div class="main-content">
+            <div class="d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <h2 class="fw-bold mb-1 text-dark">Welcome, {{ request.user.first_name|default:"Farmer" }}! 👋</h2>
+                    <p class="text-muted">Manage your livestock and poultry records with ease.</p>
+                </div>
+                <button class="btn btn-primary px-4 py-2 rounded-pill shadow" data-bs-toggle="modal" data-bs-target="#addModal">
+                    <i class="fas fa-plus-circle me-2"></i>Add Animal/Bird
+                </button>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="table-card h-100">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="icon-box bg-primary-subtle text-primary me-3">
+                                <i class="fas fa-cow fa-xl"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-0">Livestock List</h5>
+                                <small class="text-muted">Cows, Goats & Calves</small>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>ID No.</th>
+                                        <th>Breed</th>
+                                        <th>Vax Date</th>
+                                        <th class="text-end">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for animal in animals %}
+                                        {% if animal.category == 'cow' or animal.category == 'goat' %}
+                                        <tr>
+                                            <td><span class="badge-id">{{ animal.tag_id }}</span></td>
+                                            <td class="small">{{ animal.breed }}</td>
+                                            <td class="text-danger fw-bold small">{{ animal.last_vaccination|default:"Set Date" }}</td>
+                                            <td class="text-end">
+                                                <button class="btn btn-sm btn-light border rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#vaxModal{{animal.id}}">
+                                                    <i class="fas fa-calendar-plus text-primary"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                    {% empty %}
+                                        <tr><td colspan="4" class="text-center py-4 text-muted">No livestock found.</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                    {% endfor %}
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card p-3">
-                    <h5 class="mb-3">Doctor Advice</h5>
-                    {% for con in consultations %}
-                        <div class="border-bottom mb-2 pb-2">
-                            <small class="fw-bold text-success">{{ con.animal.tag_id }}</small>
-                            <p class="small m-0">{{ con.symptoms|truncatechars:30 }}</p>
-                            <span class="badge bg-warning text-dark small">{{ con.status }}</span>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <div class="modal fade" id="addModal" tabindex="-1">
-        <div class="modal-dialog">
-            <form class="modal-content p-3" method="POST">
-                {% csrf_token %}
-                <input type="text" name="tag_id" placeholder="Tag ID" class="form-control mb-2" required>
-                <input type="text" name="breed" placeholder="Breed" class="form-control mb-2" required>
-                <input type="number" name="age" placeholder="Age" class="form-control mb-2" required>
-                <input type="number" step="0.1" name="weight" placeholder="Weight" class="form-control mb-2" required>
-                <input type="hidden" name="add_animal" value="1">
-                <button type="submit" class="btn btn-custom w-100">Save Animal</button>
-            </form>
+                <div class="col-lg-6">
+                    <div class="table-card h-100">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="icon-box bg-success-subtle text-success me-3">
+                                <i class="fas fa-feather-pointed fa-xl"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-0">Poultry & Birds</h5>
+                                <small class="text-muted">Hen, Duck & Others</small>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>ID No.</th>
+                                        <th>Type</th>
+                                        <th>Vax Date</th>
+                                        <th class="text-end">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for animal in animals %}
+                                        {% if animal.category != 'cow' and animal.category != 'goat' %}
+                                        <tr>
+                                            <td><span class="badge-id text-orange" style="color: #e67e22;">{{ animal.tag_id }}</span></td>
+                                            <td class="small">{{ animal.get_category_display }}</td>
+                                            <td class="text-danger fw-bold small">{{ animal.last_vaccination|default:"Set Date" }}</td>
+                                            <td class="text-end">
+                                                <button class="btn btn-sm btn-light border rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#vaxModal{{animal.id}}">
+                                                    <i class="fas fa-calendar-plus text-success"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                    {% empty %}
+                                        <tr><td colspan="4" class="text-center py-4 text-muted">No birds found.</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</div>
+
+{% for animal in animals %}
+<div class="modal fade" id="vaxModal{{animal.id}}" tabindex="-1">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <form action="{% url 'update_vaccine' animal.id %}" method="POST" class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+            {% csrf_token %}
+            <div class="modal-body p-4 text-center">
+                <i class="fas fa-syringe fa-3x text-primary mb-3"></i>
+                <h5 class="fw-bold">Vaccination</h5>
+                <p class="text-muted small">ID: {{ animal.tag_id }}</p>
+                <input type="date" name="vaccine_date" class="form-control mb-3 text-center" required>
+                <button type="submit" class="btn btn-primary w-100 rounded-pill">Update & Report Doctor</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endfor %}
+
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="POST" class="modal-content border-0 shadow-lg">
+            {% csrf_token %}
+            <input type="hidden" name="add_animal" value="1">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Add New Entity</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Tag ID</label>
+                        <input type="text" name="tag_id" class="form-control bg-light" placeholder="e.g. C101" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Category</label>
+                        <select name="category" class="form-select bg-light">
+                            <option value="cow">Cow</option>
+                            <option value="goat">Goat</option>
+                            <option value="hen">Hen</option>
+                            <option value="duck">Duck</option>
+                            <option value="bird">Bird</option>
+                        </select>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label small fw-bold">Breed / Type</label>
+                        <input type="text" name="breed" class="form-control bg-light" placeholder="e.g. Holstein Friesian" required>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="submit" class="btn btn-primary w-100 rounded-pill py-2">Add to Dashboard</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
