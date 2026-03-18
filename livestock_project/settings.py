@@ -53,7 +53,10 @@ DATABASES = {
 STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
 LOGIN_URL = 'login'
 LOGOUT_REDIRECT_URL = 'login'
-LOGIN_REDIRECT_URL = 'farmer_dashboard' 
+LOGIN_REDIRECT_URL = 'farmer_dashboard'
+
+# --- Media Files Configuration (ছবি আপলোডের জন্য এটি নতুন যোগ করা হয়েছে) ---
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

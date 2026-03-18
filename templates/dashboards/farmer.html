@@ -15,7 +15,9 @@
         .table-card { border-radius: 20px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.05); background: white; padding: 25px; }
         .icon-box { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
         .badge-id { background: #f8f9fa; color: #11998e; font-weight: 700; border: 1px solid #dee2e6; padding: 6px 12px; border-radius: 8px; }
-        .table thead th { border: none; color: #6c757d; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
+        .swit-card { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; border-radius: 20px; border: none; padding: 25px; }
+        .diary-card { background: linear-gradient(135deg, #6a11cb, #2575fc); color: white; border-radius: 20px; border: none; padding: 25px; transition: 0.3s; text-decoration: none; display: block; }
+        .diary-card:hover { transform: translateY(-5px); color: white; }
     </style>
 </head>
 <body>
@@ -34,6 +36,9 @@
                 <a href="{% url 'farmer_dashboard' %}" class="nav-link active mb-2">
                     <i class="fas fa-th-large me-3"></i>Dashboard
                 </a>
+                <a href="{% url 'daily_diary' %}" class="nav-link mb-2">
+                    <i class="fas fa-book me-3"></i>Daily Farm Diary
+                </a>
                 <a href="{% url 'logout' %}" class="nav-link text-warning mt-5">
                     <i class="fas fa-sign-out-alt me-3"></i>Logout
                 </a>
@@ -41,17 +46,46 @@
         </div>
 
         <div class="main-content">
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-pill px-4 shadow-sm mb-4" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
             <div class="d-flex justify-content-between align-items-center mb-5">
                 <div>
-                    <h2 class="fw-bold mb-1 text-dark">Welcome, {{ request.user.first_name|default:"Farmer" }}! 👋</h2>
-                    <p class="text-muted">Manage your livestock and poultry records with ease.</p>
+                    <h2 class="fw-bold mb-1 text-dark">স্বাগতম, {{ request.user.first_name|default:"Farmer" }}! 👋</h2>
+                    <p class="text-muted">আপনার খামারের সকল পশুর তথ্য এখান থেকে পরিচালনা করুন।</p>
                 </div>
                 <button class="btn btn-primary px-4 py-2 rounded-pill shadow" data-bs-toggle="modal" data-bs-target="#addModal">
-                    <i class="fas fa-plus-circle me-2"></i>Add Animal/Bird
+                    <i class="fas fa-plus-circle me-2"></i>নতুন পশু যোগ করুন
                 </button>
             </div>
 
-            <div class="row g-4">
+            <div class="row g-4 mb-4">
+                <div class="col-12">
+                    <a href="{% url 'daily_diary' %}" class="diary-card shadow-lg">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-box bg-white text-primary me-3 shadow">
+                                    <i class="fas fa-chart-pie fa-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="fw-bold mb-0">Daily Farm Diary</h4>
+                                    <p class="mb-0 opacity-75">আজকের আয়, ব্যয় এবং সাপ্তাহিক লাভ-ক্ষতি দেখুন</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-arrow-right fa-2x opacity-50"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-5">
                 <div class="col-lg-6">
                     <div class="table-card h-100">
                         <div class="d-flex align-items-center mb-4">
@@ -59,18 +93,18 @@
                                 <i class="fas fa-cow fa-xl"></i>
                             </div>
                             <div>
-                                <h5 class="fw-bold mb-0">Livestock List</h5>
-                                <small class="text-muted">Cows, Goats & Calves</small>
+                                <h5 class="fw-bold mb-0">গবাদি পশু</h5>
+                                <small class="text-muted">গরু, ছাগল ও বাছুর</small>
                             </div>
                         </div>
                         <div class="table-responsive">
                             <table class="table align-middle">
                                 <thead>
                                     <tr>
-                                        <th>ID No.</th>
-                                        <th>Breed</th>
-                                        <th>Vax Date</th>
-                                        <th class="text-end">Action</th>
+                                        <th>ট্যাগ আইডি</th>
+                                        <th>জাত</th>
+                                        <th>ভ্যাকসিন</th>
+                                        <th class="text-end">অ্যাকশন</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -79,7 +113,7 @@
                                         <tr>
                                             <td><span class="badge-id">{{ animal.tag_id }}</span></td>
                                             <td class="small">{{ animal.breed }}</td>
-                                            <td class="text-danger fw-bold small">{{ animal.last_vaccination|default:"Set Date" }}</td>
+                                            <td class="text-danger fw-bold small">{{ animal.last_vaccination|default:"তারিখ নেই" }}</td>
                                             <td class="text-end">
                                                 <button class="btn btn-sm btn-light border rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#vaxModal{{animal.id}}">
                                                     <i class="fas fa-calendar-plus text-primary"></i>
@@ -88,7 +122,7 @@
                                         </tr>
                                         {% endif %}
                                     {% empty %}
-                                        <tr><td colspan="4" class="text-center py-4 text-muted">No livestock found.</td></tr>
+                                        <tr><td colspan="4" class="text-center py-4 text-muted">কোনো গবাদি পশু পাওয়া যায়নি।</td></tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
@@ -103,27 +137,27 @@
                                 <i class="fas fa-feather-pointed fa-xl"></i>
                             </div>
                             <div>
-                                <h5 class="fw-bold mb-0">Poultry & Birds</h5>
-                                <small class="text-muted">Hen, Duck & Others</small>
+                                <h5 class="fw-bold mb-0">হাঁস-মুরগি ও পাখি</h5>
+                                <small class="text-muted">মুরগি, হাঁস ও অন্যান্য</small>
                             </div>
                         </div>
                         <div class="table-responsive">
                             <table class="table align-middle">
                                 <thead>
                                     <tr>
-                                        <th>ID No.</th>
-                                        <th>Type</th>
-                                        <th>Vax Date</th>
-                                        <th class="text-end">Action</th>
+                                        <th>ট্যাগ আইডি</th>
+                                        <th>ধরণ</th>
+                                        <th>ভ্যাকসিন</th>
+                                        <th class="text-end">অ্যাকশন</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for animal in animals %}
                                         {% if animal.category != 'cow' and animal.category != 'goat' %}
                                         <tr>
-                                            <td><span class="badge-id text-orange" style="color: #e67e22;">{{ animal.tag_id }}</span></td>
+                                            <td><span class="badge-id" style="color: #e67e22;">{{ animal.tag_id }}</span></td>
                                             <td class="small">{{ animal.get_category_display }}</td>
-                                            <td class="text-danger fw-bold small">{{ animal.last_vaccination|default:"Set Date" }}</td>
+                                            <td class="text-danger fw-bold small">{{ animal.last_vaccination|default:"তারিখ নেই" }}</td>
                                             <td class="text-end">
                                                 <button class="btn btn-sm btn-light border rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#vaxModal{{animal.id}}">
                                                     <i class="fas fa-calendar-plus text-success"></i>
@@ -132,7 +166,7 @@
                                         </tr>
                                         {% endif %}
                                     {% empty %}
-                                        <tr><td colspan="4" class="text-center py-4 text-muted">No birds found.</td></tr>
+                                        <tr><td colspan="4" class="text-center py-4 text-muted">কোনো পাখি পাওয়া যায়নি।</td></tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
@@ -140,6 +174,46 @@
                     </div>
                 </div>
             </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="swit-card shadow-lg">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="icon-box bg-white text-success me-3 shadow">
+                                <i class="fas fa-stethoscope fa-xl"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-0">SWIT - জরুরি ডাক্তারী পরামর্শ</h5>
+                                <p class="mb-0 opacity-75 small">সরাসরি ডাক্তারকে ছবি এবং সমস্যার বিবরণ পাঠিয়ে দিন</p>
+                            </div>
+                        </div>
+                        
+                        <form action="{% url 'swit_report' %}" method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-3">
+                                    <label class="small fw-bold mb-1">পশু আইডি</label>
+                                    <input type="text" name="reg_id" class="form-control border-0 shadow-sm py-2" placeholder="উদা: C101" required>
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="small fw-bold mb-1">কি সমস্যা হচ্ছে?</label>
+                                    <input type="text" name="sms_message" class="form-control border-0 shadow-sm py-2" placeholder="যেমন: গরু খাওয়া ছেড়ে দিয়েছে..." required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="small fw-bold mb-1">ছবি আপলোড (যদি থাকে)</label>
+                                    <input type="file" name="animal_photo" class="form-control border-0 shadow-sm" accept="image/*">
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="submit" class="btn btn-dark w-100 shadow py-2">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
@@ -151,10 +225,10 @@
             {% csrf_token %}
             <div class="modal-body p-4 text-center">
                 <i class="fas fa-syringe fa-3x text-primary mb-3"></i>
-                <h5 class="fw-bold">Vaccination</h5>
-                <p class="text-muted small">ID: {{ animal.tag_id }}</p>
+                <h5 class="fw-bold">ভ্যাকসিন আপডেট</h5>
+                <p class="text-muted small">আইডি: {{ animal.tag_id }}</p>
                 <input type="date" name="vaccine_date" class="form-control mb-3 text-center" required>
-                <button type="submit" class="btn btn-primary w-100 rounded-pill">Update & Report Doctor</button>
+                <button type="submit" class="btn btn-primary w-100 rounded-pill">আপডেট ও ডাক্তারকে জানান</button>
             </div>
         </form>
     </div>
@@ -167,33 +241,33 @@
             {% csrf_token %}
             <input type="hidden" name="add_animal" value="1">
             <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold">Add New Entity</h5>
+                <h5 class="modal-title fw-bold">নতুন পশু/পাখি যোগ করুন</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-4">
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label class="form-label small fw-bold">Tag ID</label>
-                        <input type="text" name="tag_id" class="form-control bg-light" placeholder="e.g. C101" required>
+                        <label class="form-label small fw-bold">ট্যাগ আইডি</label>
+                        <input type="text" name="tag_id" class="form-control bg-light" placeholder="উদা: C101" required>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label small fw-bold">Category</label>
+                        <label class="form-label small fw-bold">ধরণ (Category)</label>
                         <select name="category" class="form-select bg-light">
-                            <option value="cow">Cow</option>
-                            <option value="goat">Goat</option>
-                            <option value="hen">Hen</option>
-                            <option value="duck">Duck</option>
-                            <option value="bird">Bird</option>
+                            <option value="cow">গরু (Cow)</option>
+                            <option value="goat">ছাগল (Goat)</option>
+                            <option value="hen">মুরগি (Hen)</option>
+                            <option value="duck">হাঁস (Duck)</option>
+                            <option value="bird">পাখি (Bird)</option>
                         </select>
                     </div>
                     <div class="col-md-12">
-                        <label class="form-label small fw-bold">Breed / Type</label>
-                        <input type="text" name="breed" class="form-control bg-light" placeholder="e.g. Holstein Friesian" required>
+                        <label class="form-label small fw-bold">জাত (Breed/Type)</label>
+                        <input type="text" name="breed" class="form-control bg-light" placeholder="উদা: দেশী বা ফ্রিজিয়ান" required>
                     </div>
                 </div>
             </div>
             <div class="modal-footer border-0 pt-0">
-                <button type="submit" class="btn btn-primary w-100 rounded-pill py-2">Add to Dashboard</button>
+                <button type="submit" class="btn btn-primary w-100 rounded-pill py-2">ড্যাশবোর্ডে যোগ করুন</button>
             </div>
         </form>
     </div>

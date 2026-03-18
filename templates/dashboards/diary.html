@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Farm Diary | DairyFarm</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f4f7f6; font-family: 'Segoe UI', sans-serif; }
+        .sidebar { background: #11998e; min-height: 100vh; color: white; position: fixed; width: 250px; }
+        .main-content { margin-left: 250px; padding: 30px; }
+        .diary-card { border-radius: 15px; border: none; box-shadow: 0 5px 20px rgba(0,0,0,0.05); background: white; padding: 20px; }
+        .summary-box { border-radius: 12px; padding: 15px; color: white; margin-bottom: 20px; }
+        .bg-income { background: linear-gradient(45deg, #11998e, #38ef7d); }
+        .bg-expense { background: linear-gradient(45deg, #ff416c, #ff4b2b); }
+        .bg-profit { background: linear-gradient(45deg, #00b4db, #0083b0); }
+        .table thead { background-color: #f8f9fa; }
+        .input-group-text { background: #f8f9fa; border-right: none; }
+        .form-control { border-left: none; }
+        .form-control:focus { box-shadow: none; border-color: #dee2e6; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar d-none d-md-block">
+    <div class="p-4 text-center">
+        <h3 class="fw-bold m-0 text-white">DairyFarm</h3>
+        <small class="opacity-75">Farm Diary</small>
+    </div>
+    <nav class="nav flex-column mt-4">
+        <a href="{% url 'farmer_dashboard' %}" class="nav-link text-white mb-2"><i class="fas fa-arrow-left me-3"></i>Back to Dashboard</a>
+    </nav>
+</div>
+
+<div class="main-content">
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="summary-box bg-income shadow">
+                <small>মোট আয় (সাপ্তাহিক)</small>
+                <h3 class="fw-bold m-0">৳ {{ total_income }}</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="summary-box bg-expense shadow">
+                <small>মোট খরচ (সাপ্তাহিক)</small>
+                <h3 class="fw-bold m-0">৳ {{ total_expense }}</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="summary-box bg-profit shadow">
+                <small>নিট লাভ/লোকসান</small>
+                <h3 class="fw-bold m-0">৳ {{ net_profit }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="diary-card shadow-sm">
+                <h5 class="fw-bold mb-4 text-primary"><i class="fas fa-pen-to-square me-2"></i>আজকের হিসাব দিন</h5>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="small fw-bold">পশু বিক্রি (সংখ্যা ও দাম)</label>
+                        <div class="input-group mb-2">
+                            <input type="number" name="animal_count" class="form-control" placeholder="টি">
+                            <input type="number" name="animal_price" class="form-control" placeholder="মোট দাম ৳">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="small fw-bold">দুধ বিক্রি (লিটার ও দাম)</label>
+                        <div class="input-group mb-2">
+                            <input type="number" step="0.1" name="milk_liters" class="form-control" placeholder="লিটার">
+                            <input type="number" name="milk_price" class="form-control" placeholder="মোট দাম ৳">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="small fw-bold">ডিম বিক্রি (টি ও দাম)</label>
+                        <div class="input-group mb-2">
+                            <input type="number" name="egg_count" class="form-control" placeholder="টি">
+                            <input type="number" name="egg_price" class="form-control" placeholder="মোট দাম ৳">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="small fw-bold">মাংস বিক্রি (কেজি ও দাম)</label>
+                        <div class="input-group mb-2">
+                            <input type="number" step="0.1" name="meat_kg" class="form-control" placeholder="কেজি">
+                            <input type="number" name="meat_price" class="form-control" placeholder="মোট দাম ৳">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="small fw-bold text-danger">খাবার/অন্যান্য খরচ</label>
+                        <input type="number" name="feed_cost" class="form-control" style="border-left: 1px solid #dee2e6;" placeholder="খরচ ৳">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-2">হিসাব সংরক্ষণ করুন</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="diary-card shadow-sm">
+                <h5 class="fw-bold mb-4"><i class="fas fa-history me-2"></i>আগের হিসাবসমূহ (কাগজের ছক অনুযায়ী)</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr class="small text-uppercase">
+                                <th>তারিখ</th>
+                                <th>পশু বিক্রি</th>
+                                <th>দুধ</th>
+                                <th>ডিম</th>
+                                <th>মাংস</th>
+                                <th>খরচ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in history %}
+                            <tr>
+                                <td class="fw-bold small">{{ record.date|date:"d M, Y" }}</td>
+                                <td>{{ record.animal_sold_count }} টি (৳{{ record.animal_sold_price }})</td>
+                                <td>{{ record.milk_liters }}L (৳{{ record.milk_price }})</td>
+                                <td>{{ record.egg_count }}টি (৳{{ record.egg_price }})</td>
+                                <td>{{ record.meat_kg }}kg (৳{{ record.meat_price }})</td>
+                                <td class="text-danger">৳{{ record.feed_cost }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="6" class="text-center py-4 text-muted">এখনো কোনো হিসাব যোগ করা হয়নি।</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

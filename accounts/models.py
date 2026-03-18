@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-# ১. ইউজার প্রোফাইল (ফার্মার না ডাক্তার তা নির্ধারণের জন্য)
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=10, choices=[('farmer', 'Farmer'), ('doctor', 'Doctor')])
@@ -9,7 +8,6 @@ class UserProfile(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.role}"
 
-# ২. পশুর মডেল (আপনার নকশা অনুযায়ী ক্যাটাগরি আপডেট করা হয়েছে)
 class Animal(models.Model):
     CATEGORY_CHOICES = [
         ('cow', 'Cow'),
@@ -24,20 +22,17 @@ class Animal(models.Model):
     breed = models.CharField(max_length=100)
     age = models.IntegerField(null=True, blank=True)
     weight = models.FloatField(null=True, blank=True)
-    # আপনার নকশা অনুযায়ী সরাসরি ভ্যাকসিন তারিখ রাখার জন্য নতুন ফিল্ড
     last_vaccination = models.DateField(null=True, blank=True) 
 
     def __str__(self):
         return f"{self.tag_id} ({self.category})"
 
-# ৩. উৎপাদন রেকর্ড (দুধ বা ডিম)
 class Production(models.Model):
     animal = models.ForeignKey(Animal, on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
     milk_amount = models.FloatField(default=0.0) 
     egg_count = models.IntegerField(default=0)
 
-# ৪. ডাক্তার এবং ভ্যাকসিনের বিস্তারিত রেকর্ড
 class Vaccination(models.Model):
     animal = models.ForeignKey(Animal, on_delete=models.CASCADE)
     vaccine_name = models.CharField(max_length=100)
@@ -45,14 +40,33 @@ class Vaccination(models.Model):
     next_due_date = models.DateField() 
     is_done = models.BooleanField(default=False)
 
-# ৫. ডাক্তার কনসালটেশন (ফার্মার রিপোর্ট করলে এখানে আসবে)
 class HealthConsultation(models.Model):
     farmer = models.ForeignKey(User, on_delete=models.CASCADE)
-    animal = models.ForeignKey(Animal, on_delete=models.CASCADE)
+    animal_reg_id = models.CharField(max_length=50)
     symptoms = models.TextField()
-    status = models.CharField(max_length=20, default='Pending') # Pending, Solved
+    report_image = models.ImageField(upload_to='health_reports/', null=True, blank=True)
+    status = models.CharField(max_length=20, default='Pending')
     doctor_advice = models.TextField(blank=True, null=True)
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Case: {self.animal.tag_id} - {self.status}"
+        return f"SWIT Report: {self.animal_reg_id} - {self.status}"
+
+class DailyFarmDiary(models.Model):
+    farmer = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
+    animal_sold_count = models.IntegerField(default=0)
+    animal_sold_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    milk_liters = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    milk_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    egg_count = models.IntegerField(default=0)
+    egg_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    meat_kg = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    meat_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    feed_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+    def total_daily_income(self):
+        return self.animal_sold_price + self.milk_price + self.egg_price + self.meat_price
+
+    def __str__(self):
+        return f"Diary - {self.date} - {self.farmer.username}"

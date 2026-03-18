@@ -13,11 +13,15 @@ urlpatterns = [
     path('farmer/', views.farmer_dashboard, name='farmer_dashboard'),
     path('doctor/', views.doctor_dashboard, name='doctor_dashboard'),
 
-    # ৩. ভ্যাকসিন আপডেট (এটি আপনার ভিউতে আছে)
+    # ৩. ভ্যাকসিন আপডেট
     path('update-vaccine/<int:animal_id>/', views.update_vaccine, name='update_vaccine'),
 
-    # ৪. অন্যান্য অ্যাকশন (নিশ্চিত করুন এই নামগুলো views.py এ আছে)
+    # ৪. SWIT ফিচার
+    path('swit-report/', views.swit_report, name='swit_report'),
+
+    # ৫. অন্যান্য অ্যাকশন
     path('report-problem/<int:animal_id>/', views.report_problem, name='report_problem'),
     path('milk-record/<int:animal_id>/', views.milk_record, name='milk_record'),
     path('prescription/<int:case_id>/', views.add_prescription, name='add_prescription'),
+    path('diary/', views.daily_diary_view, name='daily_diary')
 ]
