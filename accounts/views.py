@@ -6,10 +6,10 @@ from django.views.decorators.http import require_http_methods
 from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
-from django.db.models import Sum, Avg
+from django.db.models import Sum
 
 from .forms import CustomUserCreationForm 
-from .models import UserProfile, Animal, HealthConsultation, Production, Vaccination, DailyFarmDiary
+from .models import UserProfile, Animal, HealthConsultation, Production, DailyFarmDiary
 
 def register_view(request):
     if request.method == "POST":
@@ -17,7 +17,7 @@ def register_view(request):
         role = request.POST.get('role', 'farmer')
         if form.is_valid():
             user = form.save()
-            UserProfile.objects.create(user=user, role=role)
+            UserProfile.objects.get_or_create(user=user, defaults={'role': role})
             login(request, user)
             return redirect('doctor_dashboard' if role == 'doctor' else 'farmer_dashboard')
     else:
@@ -173,10 +173,18 @@ def doctor_dashboard(request):
     if profile.role != 'doctor': 
         return redirect('farmer_dashboard')
         
-    cases = HealthConsultation.objects.filter(status='Pending').order_by('-date')
+    pending_cases = HealthConsultation.objects.filter(status='Pending').order_by('-date')
+    
+    stats = {
+        'pending': pending_cases.count(),
+        'solved': HealthConsultation.objects.filter(status='Solved').count(),
+        'total': HealthConsultation.objects.count(),
+    }
+    
     return render(request, 'dashboards/doctor.html', {
-        'cases': cases, 
-        'profile': profile
+        'cases': pending_cases, 
+        'profile': profile,
+        'stats': stats
     })
 
 @login_required
