@@ -1,11 +1,16 @@
 import os
 from pathlib import Path
 
+# ১. আগে BASE_DIR ডিফাইন করা হয়েছে
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 SECRET_KEY = 'django-insecure-638@4z14i^*=3jpe%bq3@_)a$1i!#-q$w9kg_%5@7p098p1ax$'
+
 DEBUG = True
+
 ALLOWED_HOSTS = []
 
+# ২. অ্যাপস কনফিগারেশন
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -43,6 +48,9 @@ TEMPLATES = [
     },
 ]
 
+WSGI_APPLICATION = 'livestock_project.wsgi.application'
+
+# ৩. ডাটাবেস
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -50,13 +58,37 @@ DATABASES = {
     }
 }
 
+# ৪. পাসওয়ার্ড ভ্যালিডেশন
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
+]
+
+# ৫. ভাষা ও সময়
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'UTC'
+USE_I18N = True
+USE_TZ = True
+
+# ৬. স্ট্যাটিক ফাইল কনফিগারেশন (সঠিকভাবে সাজানো)
 STATIC_URL = 'static/'
+
+STATICFILES_DIRS = [
+    BASE_DIR / "accounts" / "static",
+]
+
+# প্রোডাকশনের জন্য কালেক্ট স্ট্যাটিক (ঐচ্ছিক)
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# ৭. মিডিয়া ফাইল (ছবি আপলোডের জন্য)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# ৮. লগইন/লগআউট রিডাইরেক্ট
 LOGIN_URL = 'login'
 LOGOUT_REDIRECT_URL = 'login'
 LOGIN_REDIRECT_URL = 'farmer_dashboard'
-
-# --- Media Files Configuration (ছবি আপলোডের জন্য এটি নতুন যোগ করা হয়েছে) ---
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

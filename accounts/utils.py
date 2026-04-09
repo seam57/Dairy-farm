@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from .models import UserProfile, Animal, HealthConsultation, MilkProduction
+from .models import UserProfile, Animal, HealthConsultation, DailyFarmDiary
 
 def login_view(request):
     if request.method == "POST":
@@ -18,13 +18,11 @@ def login_view(request):
 
 @login_required
 def farmer_dashboard(request):
-    try:
-        if request.user.profile.role != 'farmer':
-            return redirect('doctor_dashboard')
-    except UserProfile.DoesNotExist:
-        UserProfile.objects.create(user=request.user, role='farmer')
+    profile, created = UserProfile.objects.get_or_create(user=request.user, defaults={'role': 'farmer'})
+    
+    if profile.role != 'farmer':
+        return redirect('doctor_dashboard')
 
-    # পশু অ্যাড করার লজিক
     if request.method == "POST" and 'add_animal' in request.POST:
         Animal.objects.create(
             owner=request.user,
@@ -44,11 +42,14 @@ def report_problem(request, animal_id):
     animal = get_object_or_404(Animal, id=animal_id, owner=request.user)
     if request.method == "POST":
         HealthConsultation.objects.create(
-            farmer=request.user, animal=animal, symptoms=request.POST.get('symptoms')
+            farmer=request.user, 
+            animal=animal, 
+            animal_reg_id=animal.tag_id,
+            symptoms=request.POST.get('symptoms')
         )
         return redirect('farmer_dashboard')
     return render(request, 'dashboards/report_problem.html', {'animal': animal})
 
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('login_view')

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Vaccine</title>
+</head>
+<body>
+    <h2>ভ্যাকসিন আপডেট করুন: {{ animal.tag_id }}</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="date" name="vaccine_date" required>
+        <button type="submit">সেভ করুন</button>
+    </form>
+    <br>
+    <a href="{% url 'farmer_dashboard' %}">পিছনে ফিরে যান</a>
+</body>
+</html>

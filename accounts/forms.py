@@ -8,11 +8,11 @@ class CustomUserCreationForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        # ১. সব ফিল্ড থেকে হিজিবিজি হেল্প টেক্সট (যেমন: 150 characters...) রিমুভ করা
+        
         for field in self.fields.values():
             field.help_text = None  
             
-            # ২. সব ইনপুট বক্সে বুটস্ট্র্যাপ ক্লাস যোগ করা যাতে দেখতে সুন্দর হয়
+            
             field.widget.attrs.update({
                 'class': 'form-control', 
                 'placeholder': f'Enter {field.label}'
