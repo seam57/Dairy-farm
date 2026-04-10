@@ -1,48 +1,235 @@
 <!DOCTYPE html>
-<html>
+<html lang="bn">
 <head>
-    <title>Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>লগইন | DairyFarm</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        /* আপনার সুন্দর ডিজাইনের সিএসএস এখানে থাকবে */
-        body { background: #f4f7f6; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 350px; }
-        .login-card h1 { font-size: 2.5rem; margin-bottom: 10px; color: #333; }
-        .input-group { margin-bottom: 15px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], input[type="password"] { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 1rem; }
-        input[type="text"]:focus, input[type="password"]:focus { outline: none; border-color: #2ecc71; box-shadow: 0 0 5px rgba(46, 204, 113, 0.3); }
-        button { width: 100%; padding: 15px; border: none; border-radius: 10px; background: #2ecc71; color: white; font-size: 1rem; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #27ae60; }
-        .errorlist { color: red; list-style: none; padding: 0; font-size: 0.8rem; margin-top: 5px; }
+        :root {
+            --primary-green: #2d5a27;
+            --accent-green: #38ef7d;
+            --glass-bg: rgba(255, 255, 255, 0.12);
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Hind Siliguri', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #fcfdfc;
+        }
+
+        /* ১. হিরো সেকশন */
+        #home {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), 
+                              url('https://images.unsplash.com/photo-1500595046743-cd271d694d30?q=80&w=2070&auto=format&fit=crop'); 
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ২. নেভিগেশন বার */
+        .navbar {
+            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.2);
+            transition: 0.3s;
+        }
+        .navbar-brand { font-weight: 800; color: white !important; font-size: 26px; }
+        .nav-link { color: white !important; font-weight: 600; margin-left: 25px; transition: 0.3s; }
+        .nav-link:hover { color: var(--accent-green) !important; }
+
+        /* ৩. লগইন কার্ড স্টাইল */
+        .login-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            padding: 45px 35px;
+            color: white;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .login-card input {
+            width: 100% !important;
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-radius: 12px !important;
+            padding: 12px 15px !important;
+            border: none !important;
+            margin-top: 5px;
+        }
+        .btn-login {
+            background: var(--primary-green);
+            color: white;
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            border: none;
+            margin-top: 20px;
+        }
+
+        /* ৪. সেকশন কমন স্টাইল (Symmetric Alignment) */
+        .page-section {
+            padding: 120px 0;
+            text-align: center; /* সব হেডার সেন্টারে থাকবে */
+        }
+        .section-title {
+            color: var(--primary-green);
+            font-weight: 700;
+            font-size: 36px;
+            margin-bottom: 50px;
+            position: relative;
+            display: inline-block;
+        }
+        .section-title::after {
+            content: '';
+            width: 60px;
+            height: 4px;
+            background: var(--accent-green);
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        /* ৫. কার্ড স্টাইল (Services) */
+        .service-card {
+            border: none;
+            border-radius: 20px;
+            padding: 40px 25px;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: 0.3s;
+            height: 100%;
+        }
+        .service-card:hover { transform: translateY(-10px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+        .service-icon { font-size: 45px; color: #11998e; margin-bottom: 20px; }
+
+        /* ৬. কন্টাক্ট সেকশন */
+        #contact-box {
+            background: white;
+            border-radius: 30px;
+            padding: 60px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+        }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <h1>Welcome Back</h1>
-        <p>Log in to manage your livestock</p>
 
-        <form method="POST">
-            {% csrf_token %}
-            
-            {% if error_message %}
-                <div style="color: #d32f2f; margin-bottom: 15px; font-size: 0.9rem; padding: 10px; background: #ffebee; border-radius: 5px;">
-                    <p>{{ error_message }}</p>
+    <nav class="navbar navbar-expand-lg fixed-top px-5 py-3">
+        <a class="navbar-brand" href="#home"><i class="fas fa-cow me-2"></i>DairyFarm</a>
+        <div class="collapse navbar-collapse justify-content-end">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="#about">About Us</a></li>
+                <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+                <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="bg-image" id="home">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-7 text-white pe-lg-5">
+                    <p class="mb-2" style="letter-spacing: 3px; font-weight: 600; color: var(--accent-green);">PURE DAIRY GOODNESS</p>
+                    <h1 style="font-size: 3.8rem; font-weight: 700;">Nourishing Families With Pure Dairy Goodness</h1>
+                    <p class="lead opacity-90 mt-4">আধুনিক প্রযুক্তি ও বিশেষজ্ঞ পরামর্শ নিয়ে আপনার খামারের প্রতিটি পশুর স্বাস্থ্য নিশ্চিত করতে আমরা আছি পাশে।</p>
                 </div>
-            {% endif %}
-
-            <div class="input-group">
-                <label for="id_username">Username:</label>
-                <input type="text" id="id_username" name="username" value="{{ username }}" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 1rem;">
+                <div class="col-lg-4 offset-lg-1">
+                    <div class="login-card">
+                        <h2 class="text-center mb-4 fw-bold">লগইন করুন</h2>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">ইউজারনেম / আইডি</label>
+                                {{ form.username }}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">পাসওয়ার্ড</label>
+                                {{ form.password }}
+                            </div>
+                            <button type="submit" class="btn btn-login">লগইন করুন</button>
+                        </form>
+                    </div>
+                </div>
             </div>
-
-            <div class="input-group">
-                <label for="id_password">Password:</label>
-                <input type="password" id="id_password" name="password" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 1rem;">
-            </div>
-
-            <button type="submit">Login</button>
-        </form>
-        <p style="margin-top: 20px;">Don't have an account? <a href="{% url 'register' %}">Register here</a></p>
+        </div>
     </div>
+
+    <section id="about" class="page-section">
+        <div class="container text-start"> <div class="row align-items-center">
+                <div class="col-lg-7">
+                    <h2 class="section-title text-start">আমাদের সম্পর্কে</h2>
+                    <p class="lead text-muted mt-3" style="line-height: 1.8;">
+                        DairyFarm হলো একটি আধুনিক দুগ্ধ খামার ব্যবস্থাপনা সিস্টেম। আমাদের মূল লক্ষ্য হলো খামারিদের তাদের পশুদের স্বাস্থ্য, উৎপাদনশীলতা এবং সামগ্রিক খামার পরিচালনাকে আরও সহজ এবং দক্ষ করতে সাহায্য করা। আমরা বিশ্বাস করি সঠিক প্রযুক্তি এবং বিশেষজ্ঞের পরামর্শে প্রতিটি খামারকে লাভজনক করা সম্ভব।
+                    </p>
+                </div>
+                <div class="col-lg-5 text-center">
+                    <img src="https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?q=80&w=2070&auto=format&fit=crop" class="img-fluid rounded-4 shadow-lg" alt="Cow Image">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="services" class="page-section" style="background-color: #f4f9f4;">
+        <div class="container">
+            <h2 class="section-title">আমাদের সেবাসমূহ</h2>
+            <div class="row g-4 mt-2">
+                <div class="col-md-4">
+                    <div class="service-card text-center">
+                        <i class="fas fa-heartbeat service-icon"></i>
+                        <h4 class="fw-bold mb-3">পশুর স্বাস্থ্য পর্যবেক্ষণ</h4>
+                        <p class="text-muted">প্রতিটি পশুর স্বাস্থ্য রেকর্ড, ভ্যাকসিন এবং ডাক্তারী পরামর্শ ট্র‍্যাক করুন সহজে।</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="service-card text-center">
+                        <i class="fas fa-chart-line service-icon"></i>
+                        <h4 class="fw-bold mb-3">উৎপাদনশীলতা বৃদ্ধি</h4>
+                        <p class="text-muted">দুধ এবং মাংসের উৎপাদন রিপোর্ট বিশ্লেষণ করে খামারের সামগ্রিক লাভ বাড়ান।</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="service-card text-center">
+                        <i class="fas fa-user-md service-icon"></i>
+                        <h4 class="fw-bold mb-3">২৪/৭ ডাক্তার সাপোর্ট</h4>
+                        <p class="text-muted">জরুরি প্রয়োজনে আমাদের অভিজ্ঞ পশু চিকিৎসকদের সাথে সরাসরি যোগাযোগ করুন।</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="page-section">
+        <div class="container">
+            <div id="contact-box">
+                <h2 class="section-title">যোগাযোগ করুন</h2>
+                <div class="row mt-4 align-items-center text-start">
+                    <div class="col-md-6 border-end pe-lg-5">
+                        <h3 class="fw-bold" style="color: var(--primary-green);">Seam Ahmed</h3>
+                        <p class="text-muted fs-5">যেকোনো জিজ্ঞাসা বা টেকনিক্যাল সাপোর্টের জন্য সরাসরি মেইল বা ফোন করতে পারেন।</p>
+                    </div>
+                    <div class="col-md-6 ps-lg-5">
+                        <div class="mb-4">
+                            <i class="fas fa-envelope me-3" style="color: #11998e; font-size: 24px;"></i>
+                            <a href="mailto:seamhamed718@gmail.com" class="text-decoration-none fw-bold fs-5 text-dark">seamhamed718@gmail.com</a>
+                        </div>
+                        <div>
+                            <i class="fas fa-phone-alt me-3" style="color: #11998e; font-size: 24px;"></i>
+                            <a href="tel:01766878140" class="text-decoration-none fw-bold fs-5 text-dark">01766878140</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
 </body>
 </html>
