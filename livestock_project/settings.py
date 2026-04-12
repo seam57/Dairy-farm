@@ -1,19 +1,18 @@
 import os
 from pathlib import Path
-from dotenv import load_dotenv # .env ফাইল লোড করার জন্য
+from dotenv import load_dotenv
 
-# এনভায়রনমেন্ট ভেরিয়েবল লোড করা হচ্ছে
+# .env ফাইল লোড করা
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# নিরাপত্তা: সিক্রেট কি কখনোই হার্ডকোড করবেন না, তবে আপাতত এটিই থাকলো
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-638@4z14i^*=3jpe%bq3@_)a$1i!#-q$w9kg_%5@7p098p1ax$')
+# নিরাপত্তা: Render-এ পরিবেশ চলক থেকে সিক্রেট কি নেওয়া
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-default-key-change-this')
 
-# Render-এ ডেপ্লয় করলে DEBUG অবশ্যই False করা উচিত, তবে টেস্টিং এর জন্য True রাখা হলো
-DEBUG = True
+# Render-এ DEBUG False রাখা নিরাপদ
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-# Render-এ ডেপ্লয় করার জন্য '*' অথবা আপনার ডোমেইন নাম দিতে হবে
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
@@ -24,12 +23,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts',
-    'whitenoise.runserver_nostatic', # স্ট্যাটিক ফাইল হ্যান্ডেল করার জন্য
+    'whitenoise.runserver_nostatic',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # এটি যোগ করা হয়েছে স্ট্যাটিক ফাইলের জন্য
+    'whitenoise.middleware.WhiteNoiseMiddleware', # অবশ্যই SecurityMiddleware এর নিচে থাকবে
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -58,7 +57,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'livestock_project.wsgi.application'
 
-# ডেটাবেস কনফিগারেশন
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -78,24 +76,24 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# --- স্ট্যাটিক ফাইল কনফিগারেশন (WhiteNoise এর জন্য) ---
+# --- স্ট্যাটিক ফাইল কনফিগারেশন ---
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-]
-# Render এই ফোল্ডার থেকেই সব CSS/JS লোড করবে
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
-# স্ট্যাটিক ফাইল কম্প্রেস করার জন্য (WhiteNoise)
+# এটি খুব গুরুত্বপূর্ণ: যদি আপনার প্রজেক্টে 'static' ফোল্ডারটি না থাকে, তবে এরর দিবে। 
+# তাই চেক করে নিচ্ছি ফোল্ডারটি আছে কি না।
+STATICFILES_DIRS = []
+if os.path.exists(os.path.join(BASE_DIR, "static")):
+    STATICFILES_DIRS.append(os.path.join(BASE_DIR, "static"))
+
+# স্ট্যাটিক ফাইল স্টোরেজ (WhiteNoise)
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# --- মিডিয়া ফাইল কনফিগারেশন ---
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# --- লগইন ও রিডাইরেক্ট পাথ ---
 LOGIN_URL = 'login'
 LOGOUT_REDIRECT_URL = 'login'
 LOGIN_REDIRECT_URL = 'farmer_dashboard'
