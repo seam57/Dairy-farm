@@ -23,7 +23,6 @@
             background-color: #fcfdfc;
         }
 
-        /* ১. হিরো সেকশন */
         #home {
             background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), 
                               url('https://images.unsplash.com/photo-1500595046743-cd271d694d30?q=80&w=2070&auto=format&fit=crop'); 
@@ -35,7 +34,6 @@
             justify-content: center;
         }
 
-        /* ২. নেভিগেশন বার */
         .navbar {
             backdrop-filter: blur(10px);
             background: rgba(0, 0, 0, 0.2);
@@ -45,7 +43,6 @@
         .nav-link { color: white !important; font-weight: 600; margin-left: 25px; transition: 0.3s; }
         .nav-link:hover { color: var(--accent-green) !important; }
 
-        /* ৩. লগইন কার্ড স্টাইল */
         .login-card {
             background: var(--glass-bg);
             backdrop-filter: blur(15px);
@@ -62,6 +59,7 @@
             padding: 12px 15px !important;
             border: none !important;
             margin-top: 5px;
+            color: #333 !important;
         }
         .btn-login {
             background: var(--primary-green);
@@ -72,12 +70,16 @@
             font-weight: 700;
             border: none;
             margin-top: 20px;
+            transition: 0.3s;
+        }
+        .btn-login:hover {
+            background: #1e3d1a;
+            transform: translateY(-2px);
         }
 
-        /* ৪. সেকশন কমন স্টাইল (Symmetric Alignment) */
         .page-section {
             padding: 120px 0;
-            text-align: center; /* সব হেডার সেন্টারে থাকবে */
+            text-align: center;
         }
         .section-title {
             color: var(--primary-green);
@@ -99,7 +101,6 @@
             border-radius: 2px;
         }
 
-        /* ৫. কার্ড স্টাইল (Services) */
         .service-card {
             border: none;
             border-radius: 20px;
@@ -112,7 +113,6 @@
         .service-card:hover { transform: translateY(-10px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
         .service-icon { font-size: 45px; color: #11998e; margin-bottom: 20px; }
 
-        /* ৬. কন্টাক্ট সেকশন */
         #contact-box {
             background: white;
             border-radius: 30px;
@@ -140,7 +140,7 @@
                 <div class="col-lg-7 text-white pe-lg-5">
                     <p class="mb-2" style="letter-spacing: 3px; font-weight: 600; color: var(--accent-green);">PURE DAIRY GOODNESS</p>
                     <h1 style="font-size: 3.8rem; font-weight: 700;">Nourishing Families With Pure Dairy Goodness</h1>
-                    <p class="lead opacity-90 mt-4">আধুনিক প্রযুক্তি ও বিশেষজ্ঞ পরামর্শ নিয়ে আপনার খামারের প্রতিটি পশুর স্বাস্থ্য নিশ্চিত করতে আমরা আছি পাশে।</p>
+                    <p class="lead opacity-90 mt-4">আধুনিক প্রযুক্তি ও বিশেষজ্ঞ পরামর্শ নিয়ে আপনার খামারের প্রতিটি পশুর স্বাস্থ্য নিশ্চিত করতে আমরা আছি পাশে।</p>
                 </div>
                 <div class="col-lg-4 offset-lg-1">
                     <div class="login-card">
@@ -157,6 +157,12 @@
                             </div>
                             <button type="submit" class="btn btn-login">লগইন করুন</button>
                         </form>
+                        <div class="text-center mt-4">
+                            <p style="color: rgba(255,255,255,0.8); font-size: 0.95rem;">
+                                আপনার কি অ্যাকাউন্ট নেই? 
+                                <a href="{% url 'register' %}" style="color: var(--accent-green); text-decoration: none; font-weight: 700; border-bottom: 1px dashed var(--accent-green);">রেজিস্ট্রেশন করুন</a>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -164,7 +170,8 @@
     </div>
 
     <section id="about" class="page-section">
-        <div class="container text-start"> <div class="row align-items-center">
+        <div class="container text-start"> 
+            <div class="row align-items-center">
                 <div class="col-lg-7">
                     <h2 class="section-title text-start">আমাদের সম্পর্কে</h2>
                     <p class="lead text-muted mt-3" style="line-height: 1.8;">
@@ -193,14 +200,14 @@
                     <div class="service-card text-center">
                         <i class="fas fa-chart-line service-icon"></i>
                         <h4 class="fw-bold mb-3">উৎপাদনশীলতা বৃদ্ধি</h4>
-                        <p class="text-muted">দুধ এবং মাংসের উৎপাদন রিপোর্ট বিশ্লেষণ করে খামারের সামগ্রিক লাভ বাড়ান।</p>
+                        <p class="text-muted">দুধ এবং মাংসের উৎপাদন রিপোর্ট বিশ্লেষণ করে খামারের সামগ্রিক লাভ বাড়ান।</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="service-card text-center">
                         <i class="fas fa-user-md service-icon"></i>
                         <h4 class="fw-bold mb-3">২৪/৭ ডাক্তার সাপোর্ট</h4>
-                        <p class="text-muted">জরুরি প্রয়োজনে আমাদের অভিজ্ঞ পশু চিকিৎসকদের সাথে সরাসরি যোগাযোগ করুন।</p>
+                        <p class="text-muted">জরুরি প্রয়োজনে আমাদের অভিজ্ঞ পশু চিকিৎসকদের সাথে সরাসরি যোগাযোগ করুন।</p>
                     </div>
                 </div>
             </div>
@@ -231,5 +238,6 @@
         </div>
     </section>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

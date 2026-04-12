@@ -1,26 +1,131 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Farmer Dashboard | DairyFarm</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .sidebar { background: #1a252f; min-height: 100vh; color: white; position: fixed; width: 250px; z-index: 1000; }
-        .nav-link { color: #95a5a6; padding: 12px 20px; transition: 0.3s; text-decoration: none; display: block; border-radius: 10px; margin: 0 10px 5px 10px; }
-        .nav-link:hover, .nav-link.active { color: white; background: rgba(255,255,255,0.1); }
-        .nav-link.active { background: #2c3e50; color: white; }
+        :root {
+            --sidebar-bg: #0f172a;
+            --main-bg: #f8fafc;
+            --accent-green: #10b981;
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+
+        body { 
+            background-color: var(--main-bg); 
+            font-family: 'Hind Siliguri', sans-serif;
+            color: #1e293b;
+        }
+
+        /* Sidebar Styling */
+        .sidebar { 
+            background: var(--sidebar-bg); 
+            min-height: 100vh; 
+            position: fixed; 
+            width: 260px; 
+            z-index: 1000;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+        }
         
-        .main-content { margin-left: 250px; padding: 30px; width: calc(100% - 250px); }
-        .table-card { border-radius: 20px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.05); background: white; padding: 25px; }
-        .icon-box { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
-        .badge-id { background: #f8f9fa; color: #11998e; font-weight: 700; border: 1px solid #dee2e6; padding: 6px 12px; border-radius: 8px; }
-        .diary-card { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; border-radius: 20px; border: none; padding: 25px; transition: 0.3s; text-decoration: none; display: block; }
-        .diary-card:hover { transform: translateY(-5px); color: white; }
-        .history-card { border-radius: 20px; border: none; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 25px; margin-top: 30px; }
+        .nav-link { 
+            color: #94a3b8; 
+            padding: 12px 20px; 
+            transition: 0.3s; 
+            border-radius: 12px; 
+            margin: 4px 15px; 
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+        }
+        
+        .nav-link i { font-size: 1.1rem; width: 25px; }
+        .nav-link:hover, .nav-link.active { color: white; background: rgba(255,255,255,0.08); }
+        .nav-link.active { background: var(--accent-green); color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: 260px; padding: 40px; }
+        
+        /* Stats & Diary Card */
+        .diary-banner {
+            background: linear-gradient(135deg, #065f46 0%, #10b981 100%);
+            border-radius: 24px;
+            padding: 30px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            display: block;
+            text-decoration: none;
+            transition: 0.3s ease;
+            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.2);
+        }
+        .diary-banner:hover { transform: translateY(-5px); color: white; }
+
+        /* Custom Table Cards */
+        .glass-card {
+            background: white;
+            border-radius: 24px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: var(--card-shadow);
+            padding: 25px;
+            height: 100%;
+        }
+
+        .table thead th {
+            background-color: #f1f5f9;
+            border: none;
+            color: #64748b;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 15px;
+        }
+
+        .table tbody td { padding: 15px; border-bottom: 1px solid #f1f5f9; }
+
+        .tag-badge {
+            background: #f1f5f9;
+            color: #334155;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-weight: 600;
+        }
+
+        /* Buttons */
+        .btn-add {
+            background: var(--sidebar-bg);
+            color: white;
+            border-radius: 12px;
+            padding: 10px 24px;
+            font-weight: 600;
+            border: none;
+            transition: 0.3s;
+        }
+        .btn-add:hover { background: #1e293b; color: white; transform: scale(1.02); }
+
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            border: 1px solid #e2e8f0;
+            background: white;
+        }
+        .action-btn:hover { background: #f8fafc; border-color: var(--accent-green); color: var(--accent-green); }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 20px; }
+        }
     </style>
 </head>
 <body>
@@ -28,57 +133,52 @@
 <div class="container-fluid p-0">
     <div class="d-flex">
         <div class="sidebar d-none d-md-block">
-            <div class="p-4 text-center border-bottom mb-3">
-                <h3 class="fw-bold m-0 text-success">LIVESTOCK PRO</h3>
+            <div class="p-4 mb-4">
+                <h4 class="fw-bold m-0 text-white"><i class="fas fa-cow text-success me-2"></i>DairyFarm</h4>
             </div>
             <nav class="nav flex-column mt-2">
                 <a href="{% url 'profile_view' %}" class="nav-link mb-2">
                     <i class="fas fa-user-circle me-3"></i>Profile
                 </a>
-
                 <a href="{% url 'farmer_dashboard' %}" class="nav-link active mb-2">
-                    <i class="fas fa-th-large me-3"></i>Dashboard
+                    <i class="fas fa-grid-2 me-3"></i>Dashboard
                 </a>
-
                 <a href="{% url 'daily_diary' %}" class="nav-link mb-2">
-                    <i class="fas fa-book me-3"></i>AgroTrack
+                    <i class="fas fa-chart-pie me-3"></i>AgroTrack
                 </a>
-                
-                <div style="border: 1px solid #2ecc71; margin: 5px 10px; border-radius: 10px;">
-                    <a href="{% url 'farm_ai_doctor' %}" class="nav-link mb-0" style="color: #2ecc71 !important;">
+                <div class="mx-3 my-3 p-2 rounded-4" style="background: rgba(16, 185, 129, 0.1);">
+                    <a href="{% url 'farm_ai_doctor' %}" class="nav-link m-0" style="color: #10b981 !important; background: transparent;">
                         <i class="fas fa-robot me-3"></i>AI Doctor
                     </a>
                 </div>
-
-                <a href="{% url 'logout' %}" class="nav-link text-danger mt-5">
-                    <i class="fas fa-power-off me-3"></i>Logout
+                <a href="{% url 'logout' %}" class="nav-link text-danger-emphasis mt-auto">
+                    <i class="fas fa-sign-out-alt me-3"></i>Logout
                 </a>
             </nav>
         </div>
 
-        <div class="main-content">
+        <div class="main-content w-100">
             <div class="d-flex justify-content-between align-items-center mb-5">
                 <div>
-                    <h2 class="fw-bold mb-1 text-dark">স্বাগতম, {{ request.user.username }}! 👋</h2>
-                    <p class="text-muted">আপনার খামারের গোরু ও মুরগির তথ্য মিক্সড ড্যাশবোর্ড।</p>
+                    <h2 class="fw-bold text-slate-900 mb-1">স্বাগতম, {{ request.user.username }}! 👋</h2>
+                    <p class="text-secondary mb-0">আপনার খামারের প্রাণীদের বর্তমান অবস্থা একনজরে দেখুন।</p>
                 </div>
-                <button class="btn btn-primary px-4 py-2 rounded-pill shadow" data-bs-toggle="modal" data-bs-target="#addModal">
-                    <i class="fas fa-plus-circle me-2"></i>নতুন প্রাণী যোগ করুন
+                <button class="btn btn-add shadow-sm" data-bs-toggle="modal" data-bs-target="#addModal">
+                    <i class="fas fa-plus me-2"></i>নতুন প্রাণী যোগ করুন
                 </button>
             </div>
 
-            <div class="row g-4 mb-4">
+            <div class="row mb-5">
                 <div class="col-12">
-                    <a href="{% url 'daily_diary' %}" class="diary-card shadow-lg">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div class="d-flex align-items-center">
-                                <div class="icon-box bg-white text-primary me-3 shadow"><i class="fas fa-chart-line fa-xl"></i></div>
-                                <div>
-                                    <h4 class="fw-bold mb-0">Daily Farm Diary</h4>
-                                    <p class="mb-0 opacity-75">আজকের আয়, ব্যয় এবং সাপ্তাহিক লাভ-ক্ষতি দেখুন</p>
-                                </div>
+                    <a href="{% url 'daily_diary' %}" class="diary-banner">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h3 class="fw-bold mb-2">Daily Farm Diary</h3>
+                                <p class="mb-0 opacity-75">আজকের আয়-ব্যয়ের হিসাব এবং সাপ্তাহিক লাভ-ক্ষতির রিপোর্ট দেখতে এখানে ক্লিক করুন।</p>
                             </div>
-                            <i class="fas fa-arrow-right fa-2x opacity-50"></i>
+                            <div class="col-md-4 text-end d-none d-md-block">
+                                <i class="fas fa-arrow-right-long fa-3x opacity-25"></i>
+                            </div>
                         </div>
                     </a>
                 </div>
@@ -86,21 +186,33 @@
 
             <div class="row g-4">
                 <div class="col-lg-6">
-                    <div class="table-card h-100">
-                        <h5 class="fw-bold mb-4 text-primary"><i class="fas fa-cow me-2"></i>গবাদি পশু (Livestock)</h5>
+                    <div class="glass-card">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="p-2 rounded-3 bg-primary bg-opacity-10 me-3">
+                                <i class="fas fa-cow text-primary"></i>
+                            </div>
+                            <h5 class="fw-bold m-0">গবাদি পশু (Livestock)</h5>
+                        </div>
                         <div class="table-responsive">
-                            <table class="table align-middle">
-                                <thead><tr><th>ট্যাগ আইডি</th><th>জাত</th><th>ভ্যাকসিন</th><th class="text-end">অ্যাকশন</th></tr></thead>
+                            <table class="table table-borderless align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>ট্যাগ আইডি</th>
+                                        <th>জাত</th>
+                                        <th>ভ্যাকসিন</th>
+                                        <th class="text-end">অ্যাকশন</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     {% for animal in animals %}
                                         {% if animal.category == 'cow' or animal.category == 'goat' %}
                                         <tr>
-                                            <td><span class="badge-id">{{ animal.tag_id }}</span></td>
-                                            <td class="small">{{ animal.breed }}</td>
-                                            <td class="text-danger fw-bold small">{{ animal.last_vaccination_date|default:"-" }}</td>
+                                            <td><span class="tag-badge">{{ animal.tag_id }}</span></td>
+                                            <td class="small fw-semibold">{{ animal.breed }}</td>
+                                            <td><span class="text-danger small fw-bold">{{ animal.last_vaccination_date|default:"-" }}</span></td>
                                             <td class="text-end">
-                                                <button class="btn btn-sm btn-light border rounded-pill" data-bs-toggle="modal" data-bs-target="#vaxModal{{animal.id}}">
-                                                    <i class="fas fa-calendar-plus text-primary"></i>
+                                                <button class="action-btn" data-bs-toggle="modal" data-bs-target="#vaxModal{{animal.id}}">
+                                                    <i class="fas fa-syringe"></i>
                                                 </button>
                                             </td>
                                         </tr>
@@ -113,21 +225,33 @@
                 </div>
 
                 <div class="col-lg-6">
-                    <div class="table-card h-100">
-                        <h5 class="fw-bold mb-4 text-warning"><i class="fas fa-feather-pointed me-2"></i>হাঁস-মুরগি (Poultry)</h5>
+                    <div class="glass-card">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="p-2 rounded-3 bg-warning bg-opacity-10 me-3">
+                                <i class="fas fa-feather text-warning"></i>
+                            </div>
+                            <h5 class="fw-bold m-0">হাঁস-মুরগি (Poultry)</h5>
+                        </div>
                         <div class="table-responsive">
-                            <table class="table align-middle">
-                                <thead><tr><th>আইডি</th><th>ধরণ</th><th>ভ্যাকসিন</th><th class="text-end">অ্যাকশন</th></tr></thead>
+                            <table class="table table-borderless align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>আইডি</th>
+                                        <th>ধরণ</th>
+                                        <th>ভ্যাকসিন</th>
+                                        <th class="text-end">অ্যাকশন</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     {% for animal in animals %}
                                         {% if animal.category != 'cow' and animal.category != 'goat' %}
                                         <tr>
-                                            <td><span class="badge-id" style="color: #e67e22; border-color: #f39c12;">{{ animal.tag_id }}</span></td>
-                                            <td class="small">{{ animal.category }}</td>
-                                            <td class="text-danger fw-bold small">{{ animal.last_vaccination_date|default:"-" }}</td>
+                                            <td><span class="tag-badge text-warning">{{ animal.tag_id }}</span></td>
+                                            <td class="small fw-semibold">{{ animal.category }}</td>
+                                            <td><span class="text-danger small fw-bold">{{ animal.last_vaccination_date|default:"-" }}</span></td>
                                             <td class="text-end">
-                                                <button class="btn btn-sm btn-light border rounded-pill" data-bs-toggle="modal" data-bs-target="#vaxModal{{animal.id}}">
-                                                    <i class="fas fa-calendar-plus text-warning"></i>
+                                                <button class="action-btn" data-bs-toggle="modal" data-bs-target="#vaxModal{{animal.id}}">
+                                                    <i class="fas fa-syringe text-warning"></i>
                                                 </button>
                                             </td>
                                         </tr>
@@ -140,26 +264,32 @@
                 </div>
             </div>
 
-            <div class="history-card">
+            <div class="glass-card mt-4">
                 <div class="d-flex align-items-center justify-content-between mb-4">
                     <h5 class="fw-bold m-0">ভ্যাকসিনেশন হিস্ট্রি</h5>
                     <form method="GET" class="d-flex gap-2">
-                        <input type="text" name="search_id" value="{{ search_query }}" class="form-control form-control-sm" placeholder="আইডি দিয়ে সার্চ...">
-                        <button type="submit" class="btn btn-sm btn-dark">সার্চ</button>
+                        <input type="text" name="search_id" value="{{ search_query }}" class="form-control form-control-sm border-0 bg-light px-3" placeholder="আইডি সার্চ...">
+                        <button type="submit" class="btn btn-sm btn-dark px-3 rounded-3">সার্চ</button>
                     </form>
                 </div>
                 <div class="table-responsive">
                     <table class="table">
-                        <thead class="table-light"><tr><th>আইডি</th><th>তারিখ</th><th>স্ট্যাটাস</th></tr></thead>
+                        <thead class="bg-light">
+                            <tr>
+                                <th>আইডি</th>
+                                <th>তারিখ</th>
+                                <th>স্ট্যাটাস</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             {% for item in vaccination_history_list %}
                             <tr>
-                                <td><strong>{{ item.tag_id }}</strong></td>
+                                <td class="fw-bold">{{ item.tag_id }}</td>
                                 <td>{{ item.last_vaccination_date }}</td>
-                                <td><span class="badge bg-success">সম্পন্ন</span></td>
+                                <td><span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3">সম্পন্ন</span></td>
                             </tr>
                             {% empty %}
-                            <tr><td colspan="3" class="text-center opacity-50">কোনো হিস্ট্রি পাওয়া যায়নি</td></tr>
+                            <tr><td colspan="3" class="text-center py-4 text-muted">কোনো হিস্ট্রি পাওয়া যায়নি</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -172,14 +302,14 @@
 {% for animal in animals %}
 <div class="modal fade" id="vaxModal{{animal.id}}" tabindex="-1">
     <div class="modal-dialog modal-sm modal-dialog-centered">
-        <form action="{% url 'update_vaccine' animal.id %}" method="POST" class="modal-content border-0 shadow-lg">
+        <form action="{% url 'update_vaccine' animal.id %}" method="POST" class="modal-content border-0 rounded-4 overflow-hidden shadow-lg">
             {% csrf_token %}
             <div class="modal-body p-4 text-center">
-                <i class="fas fa-syringe fa-3x text-primary mb-3"></i>
+                <div class="mb-3 text-primary"><i class="fas fa-syringe fa-3x"></i></div>
                 <h5 class="fw-bold">ভ্যাকসিন আপডেট</h5>
-                <p class="small text-muted">আইডি: {{ animal.tag_id }}</p>
-                <input type="date" name="vaccine_date" class="form-control mb-3" required>
-                <button type="submit" class="btn btn-primary w-100 rounded-pill">আপডেট করুন</button>
+                <p class="small text-muted mb-4">আইডি: {{ animal.tag_id }}</p>
+                <input type="date" name="vaccine_date" class="form-control border-0 bg-light mb-3 p-3 rounded-3" required>
+                <button type="submit" class="btn btn-add w-100">আপডেট নিশ্চিত করুন</button>
             </div>
         </form>
     </div>
@@ -188,22 +318,22 @@
 
 <div class="modal fade" id="addModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <form method="POST" class="modal-content border-0 shadow-lg">
+        <form method="POST" class="modal-content border-0 rounded-4 overflow-hidden">
             {% csrf_token %}
             <input type="hidden" name="add_animal" value="1">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold">নতুন পশু যোগ করুন</h5>
+            <div class="modal-header border-0 bg-light p-4">
+                <h5 class="modal-title fw-bold">নতুন প্রাণী যোগ করুন</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-4">
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label class="form-label small fw-bold">ট্যাগ আইডি</label>
-                        <input type="text" name="tag_id" class="form-control" placeholder="উদা: C-101" required>
+                        <input type="text" name="tag_id" class="form-control p-2 border-light bg-light" placeholder="উদা: C-101" required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label small fw-bold">ধরণ</label>
-                        <select name="category" class="form-select">
+                        <select name="category" class="form-select p-2 border-light bg-light">
                             <option value="cow">গরু (Cow)</option>
                             <option value="goat">ছাগল (Goat)</option>
                             <option value="hen">মুরগি (Hen)</option>
@@ -212,12 +342,12 @@
                     </div>
                     <div class="col-md-12">
                         <label class="form-label small fw-bold">জাত</label>
-                        <input type="text" name="breed" class="form-control" placeholder="উদা: ফ্রিজিয়ান বা ব্রয়লার" required>
+                        <input type="text" name="breed" class="form-control p-2 border-light bg-light" placeholder="উদা: ফ্রিজিয়ান বা ব্রয়লার" required>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer border-0">
-                <button type="submit" class="btn btn-primary w-100 rounded-pill">যোগ করুন</button>
+            <div class="modal-footer border-0 p-4">
+                <button type="submit" class="btn btn-add w-100">তালিকায় যোগ করুন</button>
             </div>
         </form>
     </div>

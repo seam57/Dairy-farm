@@ -1,84 +1,96 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile | DairyFarm</title>
+    <title>প্রোফাইল | DairyFarm</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
-        .sidebar { background: #11998e; min-height: 100vh; color: white; position: fixed; width: 250px; z-index: 1000; }
-        .nav-link { color: white; opacity: 0.8; padding: 12px 20px; transition: 0.3s; text-decoration: none; display: block; border-radius: 10px; margin: 0 10px 5px 10px; }
-        .nav-link:hover, .nav-link.active { opacity: 1; background: rgba(255,255,255,0.2); }
-        .main-content { margin-left: 250px; padding: 30px; width: calc(100% - 250px); }
-        .card { border: none; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden; }
-        .profile-header { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; padding: 40px; }
-        .btn-update { background: #11998e; color: white; border: none; padding: 12px 30px; border-radius: 10px; font-weight: 600; }
+        body { background: #f8fafc; font-family: 'Hind Siliguri', sans-serif; }
+        .profile-card { background: white; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden; margin-top: 50px; }
+        .profile-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 40px; text-align: center; color: white; }
+        .profile-img { width: 110px; height: 110px; border-radius: 50%; border: 4px solid #10b981; background: white; padding: 5px; }
+        .info-box { padding: 40px; }
+        .form-control { border-radius: 12px; padding: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+        .btn-update { background: #10b981; color: white; border: none; padding: 12px 30px; border-radius: 12px; font-weight: 600; width: 100%; transition: 0.3s; }
+        .btn-update:hover { background: #059669; }
+        .btn-location { background: #f1f5f9; color: #475569; border: none; padding: 10px; border-radius: 10px; font-size: 0.9rem; margin-top: -10px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-<div class="container-fluid p-0">
-    <div class="d-flex">
-        <div class="sidebar d-none d-md-block">
-            <div class="p-4 text-center border-bottom mb-3">
-                <h3 class="fw-bold m-0 text-white">DairyFarm</h3>
-            </div>
-            <nav class="nav flex-column mt-2">
-                <a href="{% url 'profile_view' %}" class="nav-link active mb-2"><i class="fas fa-user-circle me-3"></i>Profile</a>
-                
-                <a href="{% url 'farmer_dashboard' %}" class="nav-link mb-2"><i class="fas fa-th-large me-3"></i>Dashboard</a>
-
-                <a href="{% url 'daily_diary' %}" class="nav-link mb-2"><i class="fas fa-book me-3"></i>AgroTrack</a>
-                
-                <div style="border: 1px solid rgba(255,255,255,0.4); margin: 5px 10px; border-radius: 10px;">
-                    <a href="{% url 'farm_ai_doctor' %}" class="nav-link mb-0"><i class="fas fa-robot me-3"></i>AI Doctor</a>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="profile-img mb-3">
+                    <h3 class="fw-bold m-0">{{ user.username }}</h3>
+                    <p class="opacity-75 mb-0">খামার আইডি: #DF-{{ user.id }}</p>
                 </div>
 
-                <a href="{% url 'logout' %}" class="nav-link text-warning mt-5"><i class="fas fa-sign-out-alt me-3"></i>Logout</a>
-            </nav>
-        </div>
-
-        <div class="main-content">
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-success shadow-sm">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-
-            <div class="card">
-                <div class="profile-header text-center">
-                    <i class="fas fa-user-circle fa-5x mb-3 text-white"></i>
-                    <h2 class="fw-bold">{{ request.user.username }}</h2>
-                    <span class="badge bg-light text-dark px-3 py-2 rounded-pill">{{ profile.role|upper }}</span>
-                </div>
-                <div class="card-body p-4 p-lg-5">
+                <div class="info-box">
                     <form method="POST">
                         {% csrf_token %}
-                        <div class="row g-3">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">First Name</label>
-                                <input type="text" name="first_name" class="form-control" value="{{ request.user.first_name }}">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Last Name</label>
-                                <input type="text" name="last_name" class="form-control" value="{{ request.user.last_name }}">
-                            </div>
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label fw-bold">Email Address</label>
-                                <input type="email" name="email" class="form-control" value="{{ request.user.email }}">
-                            </div>
-                        </div>
-                        <div class="mt-4 text-end">
-                            <button type="submit" class="btn btn-update">Update Profile</button>
-                        </div>
+                        <label class="small fw-bold text-muted">পুরো নাম</label>
+                        <input type="text" name="full_name" class="form-control" value="{{ user.first_name }}" placeholder="আপনার নাম লিখুন">
+
+                        <label class="small fw-bold text-muted">ফোন নম্বর</label>
+                        <input type="text" name="phone" class="form-control" value="{{ profile.phone|default:'' }}" placeholder="০১৭XXXXXXXX">
+
+                        <label class="small fw-bold text-muted">ঠিকানা/লোকেশন</label>
+                        <input type="text" id="location-input" name="location" class="form-control" value="{{ profile.location|default:'' }}" placeholder="গ্রাম, ইউনিয়ন, জেলা">
+                        
+                        <button type="button" onclick="getLocation()" class="btn-location w-100">
+                            <i class="fas fa-location-arrow me-2 text-primary"></i> লাইভ লোকেশন সেট করুন
+                        </button>
+
+                        <input type="hidden" name="lat" id="lat-input">
+                        <input type="hidden" name="lng" id="lng-input">
+
+                        <button type="submit" class="btn-update shadow">তথ্যাদি সংরক্ষণ করুন</button>
                     </form>
+                    
+                    <div class="text-center mt-4">
+                        <a href="{% url 'farmer_dashboard' %}" class="text-decoration-none text-muted small">
+                            <i class="fas fa-chevron-left me-1"></i> ড্যাশবোর্ডে ফিরে যান
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    function getLocation() {
+        const locationInput = document.getElementById('location-input');
+        const latInput = document.getElementById('lat-input');
+        const lngInput = document.getElementById('lng-input');
+
+        if (navigator.geolocation) {
+            alert("লোকেশন পারমিশন দিন...");
+            navigator.geolocation.getCurrentPosition(function(position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                
+                latInput.value = lat;
+                lngInput.value = lng;
+                locationInput.value = "অক্ষাংশ: " + lat.toFixed(4) + ", দ্রাঘিমাংশ: " + lng.toFixed(4);
+                
+                alert("লাইভ লোকেশন সাকসেসফুলি সেট হয়েছে!");
+            }, function(error) {
+                alert("লোকেশন পাওয়া যায়নি। ব্রাউজার পারমিশন চেক করুন।");
+            });
+        } else {
+            alert("আপনার ব্রাউজারে লোকেশন সুবিধা নেই।");
+        }
+    }
+</script>
+
 </body>
 </html>
