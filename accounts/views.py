@@ -219,9 +219,9 @@ def farm_ai_doctor(request):
             model = genai.GenerativeModel('gemini-2.5-flash')
             system_prompt = (
                 "You are an expert veterinarian. The user will describe their animal's symptoms or problems in Bengali, English, or mixed language. "
-                "Respond in simple, clear Bengali. "
-                "First, try to identify the possible disease or condition based on the symptoms described. "
-                "Then, provide practical treatment advice, including home remedies if appropriate, and when to seek professional help. "
+                "Respond directly in simple, clear Bengali without starting with greetings like নমস্কার or hello. "
+                "First, identify the likely disease or condition based on the symptoms described. "
+                "Then, give practical treatment advice, including home care steps and when to see a veterinarian. "
                 "Always end your response with: 'এটি AI পরামর্শ, প্রয়োজনে ডাক্তার দেখান।' (This is AI advice, consult a doctor if necessary.) "
                 "Be helpful, accurate, and emphasize that this is not a substitute for professional veterinary care."
             )

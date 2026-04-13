@@ -16,6 +16,18 @@
         .custom-card { border: none; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); background: white; margin-bottom: 25px; padding: 20px; }
         .ai-doctor-btn { border: 2px solid #2ecc71; border-radius: 10px; margin-top: 10px; transition: 0.3s; }
         .ai-doctor-btn:hover { background: rgba(46, 204, 113, 0.1); }
+
+        @media (max-width: 992px) {
+            .sidebar { position: relative; width: 100%; min-height: auto; height: auto; }
+            .sidebar nav { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+            .sidebar .nav-link { margin: 4px 0; }
+            .main-content { margin-left: 0; width: 100%; padding: 20px; }
+        }
+
+        @media (max-width: 576px) {
+            .sidebar { padding: 15px; }
+            .main-content { padding: 15px; }
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>

@@ -43,6 +43,20 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
         }
 
+        @media (max-width: 992px) {
+            .sidebar { position: relative; width: 100%; height: auto; min-height: auto; }
+            .main-content { margin-left: 0; width: 100%; height: auto; padding: 15px; }
+            .chat-container { height: auto; }
+            .chat-header, .chat-input-area { padding: 15px; }
+        }
+
+        @media (max-width: 576px) {
+            .sidebar { padding: 15px; }
+            .chat-messages { padding: 15px; }
+            .input-group-custom { flex-direction: column; gap: 10px; }
+            .send-btn { width: 100%; }
+        }
+
         /* Header Area */
         .chat-header {
             padding: 15px 25px; border-bottom: 1px solid #eee;
