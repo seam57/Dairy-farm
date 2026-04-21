@@ -17,7 +17,7 @@ from .models import UserProfile, Animal, DailyFarmDiary, HealthConsultation, Vac
 load_dotenv()
 genai.configure(api_key=os.environ.get('GEMINI_API_KEY'))
 
-# --- Farmer Dashboard (Search Logic) ---
+# --- Farmer Dashboard ---
 @login_required
 def farmer_dashboard(request):
     if request.method == "POST" and 'add_animal' in request.POST:
@@ -30,29 +30,39 @@ def farmer_dashboard(request):
 
     animals = Animal.objects.filter(owner=request.user)
     search_query = request.GET.get('search_id', '').strip()
-    
+
     # শুরুতে হিস্ট্রি লিস্ট খালি থাকবে
     vaccination_history_list = []
-    
+
     # শুধুমাত্র সার্চ বাটনে ক্লিক করলে ডাটা আসবে
     if search_query:
         vaccination_history_list = VaccinationRecord.objects.filter(
-            animal__owner=request.user, 
+            animal__owner=request.user,
             animal__tag_id__iexact=search_query
         ).order_by('-date')
+
+    # ── NEW: Dashboard summary card data ──
+    vaccinated_count   = animals.filter(last_vaccination_date__isnull=False).count()
+    unvaccinated_count = animals.filter(last_vaccination_date__isnull=True).count()
+    total_diary_records = DailyFarmDiary.objects.filter(farmer=request.user).count()
 
     return render(request, 'dashboards/farmer.html', {
         'animals': animals,
         'vaccination_history_list': vaccination_history_list,
         'search_query': search_query,
+        # NEW variables for summary cards
+        'vaccinated_count': vaccinated_count,
+        'unvaccinated_count': unvaccinated_count,
+        'total_diary_records': total_diary_records,
     })
 
-# --- Doctor Dashboard (যেটি মিসিং ছিল) ---
+
+# --- Doctor Dashboard ---
 @login_required
 def doctor_dashboard(request):
-    # ডাক্তারের প্রোফাইল বা কেস হিস্ট্রি দেখার জন্য
     cases = HealthConsultation.objects.all().order_by('-date')
     return render(request, 'dashboards/doctor.html', {'cases': cases})
+
 
 # --- Update Vaccine ---
 @login_required
@@ -65,6 +75,7 @@ def update_vaccine(request, animal_id):
             animal.save()
             VaccinationRecord.objects.create(animal=animal, date=vax_date)
     return redirect('farmer_dashboard')
+
 
 # --- AI Diet Planner ---
 @login_required
@@ -88,6 +99,7 @@ def diet_planner_view(request):
             response_text = "AI সার্ভিস এখন ব্যস্ত।"
     return render(request, 'dashboards/diet_planner.html', {'response': response_text})
 
+
 # --- AgroTrack/Diary ---
 @login_required
 def daily_diary_view(request):
@@ -100,29 +112,78 @@ def daily_diary_view(request):
             animal_obj = Animal.objects.filter(id=animal_id).first() if animal_id else None
             DailyFarmDiary.objects.create(
                 farmer=request.user, animal=animal_obj,
-                milk_income=request.POST.get('milk_income') or 0, meat_income=request.POST.get('meat_income') or 0,
-                egg_income=request.POST.get('egg_income') or 0, feed_cost=request.POST.get('feed_cost') or 0,
-                medicine_cost=request.POST.get('medicine_cost') or 0, other_cost=request.POST.get('other_cost') or 0
+                milk_income=request.POST.get('milk_income') or 0,
+                meat_income=request.POST.get('meat_income') or 0,
+                egg_income=request.POST.get('egg_income') or 0,
+                feed_cost=request.POST.get('feed_cost') or 0,
+                medicine_cost=request.POST.get('medicine_cost') or 0,
+                other_cost=request.POST.get('other_cost') or 0
             )
             return redirect('daily_diary')
 
     history = DailyFarmDiary.objects.filter(farmer=request.user).order_by('-date')
     animals = Animal.objects.filter(owner=request.user)
 
-    # চার্টের জন্য ডাটা (সহজ করার জন্য গত ১০ দিনের ডাটা)
-    history_asc = history.reverse()
-    chart_dates = [r.date.strftime("%d %b") for r in history_asc]
-    chart_incomes = [float(r.total_income) for r in history_asc]
+    # চার্টের জন্য ডাটা — পুরনো logic ঠিক আছে
+    history_asc = list(history.order_by('date'))
+    chart_dates    = [r.date.strftime("%d %b") for r in history_asc]
+    chart_incomes  = [float(r.total_income) for r in history_asc]
     chart_expenses = [float(r.total_expense) for r in history_asc]
-    
+
     agg = history.aggregate(m=Sum('milk_income'), mt=Sum('meat_income'), e=Sum('egg_income'))
     pie_data = [float(agg['m'] or 0), float(agg['mt'] or 0), float(agg['e'] or 0)]
 
+    # ── NEW: AgroTrack summary totals (মোট আয়, ব্যয়, নিট লাভ) ──
+    totals = history.aggregate(
+        ti=Sum('milk_income'),
+        tm=Sum('meat_income'),
+        te=Sum('egg_income'),
+        tf=Sum('feed_cost'),
+        tmed=Sum('medicine_cost'),
+        to=Sum('other_cost')
+    )
+    total_income  = float((totals['ti'] or 0) + (totals['tm'] or 0) + (totals['te'] or 0))
+    total_expense = float((totals['tf'] or 0) + (totals['tmed'] or 0) + (totals['to'] or 0))
+    net_profit    = total_income - total_expense
+
+    # ── NEW: Individual Animal ROI — পশু ভিত্তিক লাভ-ক্ষতি ──
+    animal_stats = []
+    for animal in animals:
+        records = history.filter(animal=animal)
+        if records.exists():
+            agg_a = records.aggregate(
+                mi=Sum('milk_income'), mt=Sum('meat_income'), ei=Sum('egg_income'),
+                fc=Sum('feed_cost'),   mc=Sum('medicine_cost'), oc=Sum('other_cost')
+            )
+            income  = float((agg_a['mi'] or 0) + (agg_a['mt'] or 0) + (agg_a['ei'] or 0))
+            expense = float((agg_a['fc'] or 0) + (agg_a['mc'] or 0) + (agg_a['oc'] or 0))
+            profit  = income - expense
+            category_display = {
+                'cow': 'গরু', 'goat': 'ছাগল', 'hen': 'মুরগি', 'duck': 'হাঁস'
+            }.get(animal.category, animal.category)
+            animal_stats.append({
+                'tag_id':   animal.tag_id,
+                'category': category_display,
+                'income':   income,
+                'expense':  expense,
+                'profit':   profit,
+            })
+
     return render(request, 'dashboards/diary.html', {
-        'history': history, 'animals': animals,
-        'chart_dates': json.dumps(chart_dates), 'chart_incomes': json.dumps(chart_incomes),
-        'chart_expenses': json.dumps(chart_expenses), 'pie_data': json.dumps(pie_data)
+        # পুরনো variables — ঠিক আছে
+        'history':        history,
+        'animals':        animals,
+        'chart_dates':    json.dumps(chart_dates),
+        'chart_incomes':  json.dumps(chart_incomes),
+        'chart_expenses': json.dumps(chart_expenses),
+        'pie_data':       json.dumps(pie_data),
+        # NEW variables
+        'animal_stats':   animal_stats,
+        'total_income':   total_income,
+        'total_expense':  total_expense,
+        'net_profit':     net_profit,
     })
+
 
 # --- AI Doctor ---
 @login_required
@@ -143,6 +204,7 @@ def farm_ai_doctor(request):
         except:
             response_text = "AI সার্ভিস এখন বন্ধ।"
     return render(request, 'dashboards/farm_ai.html', {'response': response_text})
+
 
 # --- Authentication ---
 def login_view(request):
@@ -177,6 +239,7 @@ def profile_view(request):
     if request.method == "POST":
         request.user.first_name = request.POST.get('full_name')
         request.user.save()
-        profile.phone = request.POST.get('phone'); profile.save()
+        profile.phone = request.POST.get('phone')
+        profile.save()
         return redirect('profile_view')
     return render(request, 'accounts/profile.html', {'profile': profile})
