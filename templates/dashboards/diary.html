@@ -17,8 +17,8 @@
         .nav-link.active { background: #2c3e50; color: white; }
         .btn-submit { background: #2ecc71; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: bold; }
         .btn-clear { background: #e74c3c; color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; margin-top: 10px; }
-        .badge-profit { background: rgba(46, 204, 113, 0.1); color: #2ecc71; }
-        .badge-loss { background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
+        .badge-profit { background: rgba(46, 204, 113, 0.1); color: #2ecc71; font-weight: bold; }
+        .badge-loss { background: rgba(231, 76, 60, 0.1); color: #e74c3c; font-weight: bold; }
         .animal-tag { font-size: 0.8rem; background: #eef2f7; padding: 2px 8px; border-radius: 5px; }
     </style>
 </head>
@@ -39,7 +39,7 @@
     <div class="row">
         <div class="col-xl-4">
             <div class="custom-card p-4">
-                <h5 class="fw-bold mb-3">হিসাব যোগ করুন</h5>
+                <h5 class="fw-bold mb-3 text-dark">হিসাব যোগ করুন</h5>
                 <form method="POST">
                     {% csrf_token %}
                     <div class="mb-3">
@@ -80,27 +80,33 @@
 
         <div class="col-xl-8">
             <div class="custom-card p-4">
-                <h5 class="fw-bold mb-4">লাভ ও ক্ষতির গতিপথ</h5>
+                <h5 class="fw-bold mb-4 text-dark">লাভ ও ক্ষতির গতিপথ</h5>
                 <div style="height: 300px;"><canvas id="trendChart"></canvas></div>
             </div>
 
             <div class="custom-card p-4">
                 <h5 class="fw-bold mb-3 text-primary">পশু ভিত্তিক লাভ-ক্ষতি</h5>
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover align-middle">
                         <thead class="table-light"><tr><th>আইডি</th><th>ধরণ</th><th>আয়</th><th>ব্যয়</th><th>নিট লাভ</th><th>অবস্থা</th></tr></thead>
                         <tbody>
                             {% for stat in animal_stats %}
                             <tr>
-                                <td class="fw-bold">#{{ stat.tag_id }}</td>
-                                <td>{{ stat.category }}</td>
-                                <td class="text-success">৳{{ stat.income }}</td>
-                                <td class="text-danger">৳{{ stat.expense }}</td>
-                                <td>৳{{ stat.profit }}</td>
-                                <td>{% if stat.profit >= 0 %}<span class="badge badge-profit px-3 py-2 rounded-pill">লাভ</span>{% else %}<span class="badge badge-loss px-3 py-2 rounded-pill">লোকসান</span>{% endif %}</td>
+                                <td class="fw-bold text-dark">#{{ stat.tag_id }}</td>
+                                <td class="text-secondary">{{ stat.category }}</td>
+                                <td class="text-success fw-semibold">৳{{ stat.income|floatformat:1 }}</td>
+                                <td class="text-danger fw-semibold">৳{{ stat.expense|floatformat:1 }}</td>
+                                <td class="fw-bold">৳{{ stat.profit|floatformat:1 }}</td>
+                                <td>
+                                    {% if stat.profit >= 0 %}
+                                    <span class="badge badge-profit px-3 py-2 rounded-pill">লাভ</span>
+                                    {% else %}
+                                    <span class="badge badge-loss px-3 py-2 rounded-pill">লোকসান</span>
+                                    {% endif %}
+                                </td>
                             </tr>
                             {% empty %}
-                            <tr><td colspan="6" class="text-center py-3">তথ্য নেই</td></tr>
+                            <tr><td colspan="6" class="text-center py-4 text-muted">তথ্য নেই</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -110,19 +116,21 @@
             <div class="custom-card p-4">
                 <h5 class="fw-bold mb-3 text-secondary">সাম্প্রতিক লেনদেন</h5>
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover align-middle">
                         <thead class="table-light"><tr><th>তারিখ</th><th>পশু আইডি</th><th>আয়</th><th>ব্যয়</th><th>নিট লাভ</th></tr></thead>
                         <tbody>
                             {% for record in history %}
                             <tr>
-                                <td>{{ record.date|date:"d M" }}</td>
+                                <td class="text-dark">{{ record.date|date:"d M" }}</td>
                                 <td>{% if record.animal %}<span class="animal-tag">#{{ record.animal.tag_id }}</span>{% else %}<span class="text-muted small">জেনারেল</span>{% endif %}</td>
-                                <td class="text-success">৳{{ record.total_income }}</td>
-                                <td class="text-danger">৳{{ record.total_expense }}</td>
-                                <td class="fw-bold">৳{{ record.net_profit }}</td>
+                                <td class="text-success fw-semibold">৳{{ record.total_income|floatformat:1 }}</td>
+                                <td class="text-danger fw-semibold">৳{{ record.total_expense|floatformat:1 }}</td>
+                                <td class="fw-bold text-dark">
+                                    ৳{{ record.net_profit|floatformat:1 }}
+                                </td>
                             </tr>
                             {% empty %}
-                            <tr><td colspan="5" class="text-center py-3">লেনদেন নেই</td></tr>
+                            <tr><td colspan="5" class="text-center py-4 text-muted">লেনদেন নেই</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -148,15 +156,29 @@
         if (dataElement) {
             const data = JSON.parse(dataElement.textContent);
             
-            // Trend Line Chart (FIXED FOR SINGLE DATA POINT)
+            // Trend Line Chart
             new Chart(document.getElementById('trendChart'), {
                 type: 'line',
                 data: {
                     labels: data.dates.length > 0 ? data.dates : ["আজ"],
                     datasets: [{
-                        label: 'আয়', data: data.incomes.length > 0 ? data.incomes : [0], borderColor: '#2ecc71', backgroundColor: 'rgba(46, 204, 113, 0.1)', fill: true, tension: 0.4, pointRadius: 6, pointBackgroundColor: '#2ecc71'
+                        label: 'আয়', 
+                        data: data.incomes.length > 0 ? data.incomes : [0], 
+                        borderColor: '#2ecc71', 
+                        backgroundColor: 'rgba(46, 204, 113, 0.1)', 
+                        fill: true, 
+                        tension: 0.4, 
+                        pointRadius: 6, 
+                        pointBackgroundColor: '#2ecc71'
                     }, {
-                        label: 'ব্যয়', data: data.expenses.length > 0 ? data.expenses : [0], borderColor: '#e74c3c', backgroundColor: 'rgba(231, 76, 60, 0.1)', fill: true, tension: 0.4, pointRadius: 6, pointBackgroundColor: '#e74c3c'
+                        label: 'ব্যয়', 
+                        data: data.expenses.length > 0 ? data.expenses : [0], 
+                        borderColor: '#e74c3c', 
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)', 
+                        fill: true, 
+                        tension: 0.4, 
+                        pointRadius: 6, 
+                        pointBackgroundColor: '#e74c3c'
                     }]
                 },
                 options: { 

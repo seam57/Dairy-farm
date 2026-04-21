@@ -23,115 +23,29 @@
             color: #1e293b;
         }
 
-        /* Sidebar Styling */
-        .sidebar { 
-            background: var(--sidebar-bg); 
-            min-height: 100vh; 
-            position: fixed; 
-            width: 260px; 
-            z-index: 1000;
-            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
-        }
-        
-        .nav-link { 
-            color: #94a3b8; 
-            padding: 12px 20px; 
-            transition: 0.3s; 
-            border-radius: 12px; 
-            margin: 4px 15px; 
-            display: flex;
-            align-items: center;
-            font-weight: 500;
-        }
-        
+        .sidebar { background: var(--sidebar-bg); min-height: 100vh; position: fixed; width: 260px; z-index: 1000; box-shadow: 4px 0 10px rgba(0,0,0,0.1); }
+        .nav-link { color: #94a3b8; padding: 12px 20px; transition: 0.3s; border-radius: 12px; margin: 4px 15px; display: flex; align-items: center; font-weight: 500; text-decoration: none; }
         .nav-link i { font-size: 1.1rem; width: 25px; }
         .nav-link:hover, .nav-link.active { color: white; background: rgba(255,255,255,0.08); }
         .nav-link.active { background: var(--accent-green); color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
-
-        /* Main Content */
         .main-content { margin-left: 260px; padding: 40px; }
         
-        /* Stats & Diary Card */
-        .diary-banner {
-            background: linear-gradient(135deg, #065f46 0%, #10b981 100%);
-            border-radius: 24px;
-            padding: 30px;
-            color: white;
-            position: relative;
-            overflow: hidden;
-            display: block;
-            text-decoration: none;
-            transition: 0.3s ease;
-            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.2);
-        }
+        /* Stylish Welcome Section */
+        .welcome-title { color: #0f172a; font-size: 2.2rem; letter-spacing: -0.5px; }
+        .username-highlight { color: var(--accent-green); position: relative; display: inline-block; }
+        .username-highlight::after { content: ''; position: absolute; width: 100%; height: 8px; background: rgba(16, 185, 129, 0.15); bottom: 5px; left: 0; z-index: -1; border-radius: 4px; }
+        
+        .diary-banner { background: linear-gradient(135deg, #065f46 0%, #10b981 100%); border-radius: 24px; padding: 30px; color: white; position: relative; overflow: hidden; display: block; text-decoration: none; transition: 0.3s ease; box-shadow: 0 15px 30px rgba(16, 185, 129, 0.2); }
         .diary-banner:hover { transform: translateY(-5px); color: white; }
-
-        /* Custom Table Cards */
-        .glass-card {
-            background: white;
-            border-radius: 24px;
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            box-shadow: var(--card-shadow);
-            padding: 25px;
-            height: 100%;
-        }
-
-        .table thead th {
-            background-color: #f1f5f9;
-            border: none;
-            color: #64748b;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 15px;
-        }
-
-        .table tbody td { padding: 15px; border-bottom: 1px solid #f1f5f9; }
-
-        .tag-badge {
-            background: #f1f5f9;
-            color: #334155;
-            padding: 5px 12px;
-            border-radius: 8px;
-            font-family: monospace;
-            font-weight: 600;
-        }
-
-        /* Buttons */
-        .btn-add {
-            background: var(--sidebar-bg);
-            color: white;
-            border-radius: 12px;
-            padding: 10px 24px;
-            font-weight: 600;
-            border: none;
-            transition: 0.3s;
-        }
+        .glass-card { background: white; border-radius: 24px; border: 1px solid rgba(226, 232, 240, 0.8); box-shadow: var(--card-shadow); padding: 25px; height: 100%; }
+        .table thead th { background-color: #f1f5f9; border: none; color: #64748b; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 15px; }
+        .tag-badge { background: #f1f5f9; color: #334155; padding: 5px 12px; border-radius: 8px; font-family: monospace; font-weight: 600; }
+        .btn-add { background: var(--sidebar-bg); color: white; border-radius: 12px; padding: 10px 24px; font-weight: 600; border: none; transition: 0.3s; }
         .btn-add:hover { background: #1e293b; color: white; transform: scale(1.02); }
-
-        .action-btn {
-            width: 35px;
-            height: 35px;
-            border-radius: 10px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
-            border: 1px solid #e2e8f0;
-            background: white;
-        }
-        .action-btn:hover { background: #f8fafc; border-color: var(--accent-green); color: var(--accent-green); }
-
-        @media (max-width: 1200px) {
-            .main-content { margin-left: 0; padding: 30px 20px; }
-        }
-
-        @media (max-width: 768px) {
-            .sidebar { display: none; }
-            .main-content { margin-left: 0; padding: 20px; }
-            .diary-banner { padding: 25px; }
-            .glass-card { padding: 20px; }
-        }
+        .action-btn { width: 35px; height: 35px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; border: 1px solid #e2e8f0; background: white; cursor: pointer; }
+        
+        @media (max-width: 1200px) { .main-content { margin-left: 0; padding: 30px 20px; } }
+        @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; padding: 20px; } }
     </style>
 </head>
 <body>
@@ -143,31 +57,26 @@
                 <h4 class="fw-bold m-0 text-white"><i class="fas fa-cow text-success me-2"></i>DairyFarm</h4>
             </div>
             <nav class="nav flex-column mt-2">
-                <a href="{% url 'profile_view' %}" class="nav-link mb-2">
-                    <i class="fas fa-user-circle me-3"></i>Profile
-                </a>
-                <a href="{% url 'farmer_dashboard' %}" class="nav-link active mb-2">
-                    <i class="fas fa-grid-2 me-3"></i>Dashboard
-                </a>
-                <a href="{% url 'daily_diary' %}" class="nav-link mb-2">
-                    <i class="fas fa-chart-pie me-3"></i>AgroTrack
-                </a>
+                <a href="{% url 'profile_view' %}" class="nav-link mb-2"><i class="fas fa-user-circle me-3"></i>প্রোফাইল</a>
+                <a href="{% url 'farmer_dashboard' %}" class="nav-link active mb-2"><i class="fas fa-grid-2 me-3"></i>ড্যাশবোর্ড</a>
+                <a href="{% url 'daily_diary' %}" class="nav-link mb-2"><i class="fas fa-chart-pie me-3"></i>এগ্রোট্র্যাক</a>
                 <div class="mx-3 my-3 p-2 rounded-4" style="background: rgba(16, 185, 129, 0.1);">
-                    <a href="{% url 'farm_ai_doctor' %}" class="nav-link m-0" style="color: #10b981 !important; background: transparent;">
-                        <i class="fas fa-robot me-3"></i>AI Doctor
-                    </a>
+                    <a href="{% url 'farm_ai_doctor' %}" class="nav-link m-0" style="color: #10b981 !important; background: transparent;"><i class="fas fa-robot me-3"></i>এআই ডাক্তার</a>
                 </div>
-                <a href="{% url 'logout' %}" class="nav-link text-danger-emphasis mt-auto">
-                    <i class="fas fa-sign-out-alt me-3"></i>Logout
-                </a>
+                <a href="{% url 'logout' %}" class="nav-link text-danger-emphasis mt-auto"><i class="fas fa-sign-out-alt me-3"></i>লগআউট</a>
             </nav>
         </div>
 
         <div class="main-content w-100">
+            
             <div class="d-flex justify-content-between align-items-center mb-5">
                 <div>
-                    <h2 class="fw-bold text-slate-900 mb-1">স্বাগতম, {{ request.user.username }}! 👋</h2>
-                    <p class="text-secondary mb-0">আপনার খামারের প্রাণীদের বর্তমান অবস্থা একনজরে দেখুন।</p>
+                    <h2 class="welcome-title fw-bold mb-1">
+                        স্বাগতম, <span class="username-highlight">{{ request.user.username }}</span>! 
+                    </h2>
+                    <p class="text-secondary mb-0 fw-medium" style="font-size: 1.05rem; opacity: 0.8;">
+                        আপনার খামারের বর্তমান অবস্থা এবং রেকর্ড পরিচালনা করুন।
+                    </p>
                 </div>
                 <button class="btn btn-add shadow-sm" data-bs-toggle="modal" data-bs-target="#addModal">
                     <i class="fas fa-plus me-2"></i>নতুন প্রাণী যোগ করুন
@@ -179,8 +88,8 @@
                     <a href="{% url 'daily_diary' %}" class="diary-banner">
                         <div class="row align-items-center">
                             <div class="col-md-8">
-                                <h3 class="fw-bold mb-2">Daily Farm Diary</h3>
-                                <p class="mb-0 opacity-75">আজকের আয়-ব্যয়ের হিসাব এবং সাপ্তাহিক লাভ-ক্ষতির রিপোর্ট দেখতে এখানে ক্লিক করুন।</p>
+                                <h3 class="fw-bold mb-2">খামার ডায়েরি (AgroTrack)</h3>
+                                <p class="mb-0 opacity-75">আজকের আয়-ব্যয়ের হিসাব এবং লাভ-ক্ষতির রিপোর্ট দেখতে এখানে ক্লিক করুন।</p>
                             </div>
                             <div class="col-md-4 text-end d-none d-md-block">
                                 <i class="fas fa-arrow-right-long fa-3x opacity-25"></i>
@@ -190,13 +99,11 @@
                 </div>
             </div>
 
-            <div class="row g-4">
+            <div class="row g-4 mb-5">
                 <div class="col-lg-6">
                     <div class="glass-card">
                         <div class="d-flex align-items-center mb-4">
-                            <div class="p-2 rounded-3 bg-primary bg-opacity-10 me-3">
-                                <i class="fas fa-cow text-primary"></i>
-                            </div>
+                            <div class="p-2 rounded-3 bg-primary bg-opacity-10 me-3"><i class="fas fa-cow text-primary"></i></div>
                             <h5 class="fw-bold m-0">গবাদি পশু (Livestock)</h5>
                         </div>
                         <div class="table-responsive">
@@ -217,9 +124,7 @@
                                             <td class="small fw-semibold">{{ animal.breed }}</td>
                                             <td><span class="text-danger small fw-bold">{{ animal.last_vaccination_date|default:"-" }}</span></td>
                                             <td class="text-end">
-                                                <button class="action-btn" data-bs-toggle="modal" data-bs-target="#vaxModal{{animal.id}}">
-                                                    <i class="fas fa-syringe"></i>
-                                                </button>
+                                                <button class="action-btn" data-bs-toggle="modal" data-bs-target="#vaxModal{{animal.id}}"><i class="fas fa-syringe"></i></button>
                                             </td>
                                         </tr>
                                         {% endif %}
@@ -233,9 +138,7 @@
                 <div class="col-lg-6">
                     <div class="glass-card">
                         <div class="d-flex align-items-center mb-4">
-                            <div class="p-2 rounded-3 bg-warning bg-opacity-10 me-3">
-                                <i class="fas fa-feather text-warning"></i>
-                            </div>
+                            <div class="p-2 rounded-3 bg-warning bg-opacity-10 me-3"><i class="fas fa-feather text-warning"></i></div>
                             <h5 class="fw-bold m-0">হাঁস-মুরগি (Poultry)</h5>
                         </div>
                         <div class="table-responsive">
@@ -250,15 +153,13 @@
                                 </thead>
                                 <tbody>
                                     {% for animal in animals %}
-                                        {% if animal.category != 'cow' and animal.category != 'goat' %}
+                                        {% if animal.category == 'hen' or animal.category == 'duck' %}
                                         <tr>
                                             <td><span class="tag-badge text-warning">{{ animal.tag_id }}</span></td>
-                                            <td class="small fw-semibold">{{ animal.category }}</td>
+                                            <td class="small fw-semibold text-capitalize">{% if animal.category == 'hen' %} মুরগি {% else %} হাঁস {% endif %}</td>
                                             <td><span class="text-danger small fw-bold">{{ animal.last_vaccination_date|default:"-" }}</span></td>
                                             <td class="text-end">
-                                                <button class="action-btn" data-bs-toggle="modal" data-bs-target="#vaxModal{{animal.id}}">
-                                                    <i class="fas fa-syringe text-warning"></i>
-                                                </button>
+                                                <button class="action-btn" data-bs-toggle="modal" data-bs-target="#vaxModal{{animal.id}}"><i class="fas fa-syringe text-warning"></i></button>
                                             </td>
                                         </tr>
                                         {% endif %}
@@ -270,12 +171,12 @@
                 </div>
             </div>
 
-            <div class="glass-card mt-4">
+            <div class="glass-card">
                 <div class="d-flex align-items-center justify-content-between mb-4">
                     <h5 class="fw-bold m-0">ভ্যাকসিনেশন হিস্ট্রি</h5>
-                    <form method="GET" class="d-flex gap-2">
-                        <input type="text" name="search_id" value="{{ search_query }}" class="form-control form-control-sm border-0 bg-light px-3" placeholder="আইডি সার্চ...">
-                        <button type="submit" class="btn btn-sm btn-dark px-3 rounded-3">সার্চ</button>
+                    <form method="GET" action="{% url 'farmer_dashboard' %}" class="d-flex gap-2">
+                        <input type="text" name="search_id" value="{{ search_query }}" class="form-control form-control-sm border-0 bg-light px-3" placeholder="আইডি দিয়ে সার্চ দিন (যেমন: k66)..." style="min-width: 200px;">
+                        <button type="submit" class="btn btn-sm btn-dark px-4 rounded-3">সার্চ</button>
                     </form>
                 </div>
                 <div class="table-responsive">
@@ -283,6 +184,7 @@
                         <thead class="bg-light">
                             <tr>
                                 <th>আইডি</th>
+                                <th>ধরণ</th>
                                 <th>তারিখ</th>
                                 <th>স্ট্যাটাস</th>
                             </tr>
@@ -290,12 +192,27 @@
                         <tbody>
                             {% for item in vaccination_history_list %}
                             <tr>
-                                <td class="fw-bold">{{ item.tag_id }}</td>
-                                <td>{{ item.last_vaccination_date }}</td>
+                                <td class="fw-bold">{{ item.animal.tag_id }}</td>
+                                <td class="text-capitalize">
+                                    {% if item.animal.category == 'cow' %} গরু 
+                                    {% elif item.animal.category == 'goat' %} ছাগল 
+                                    {% elif item.animal.category == 'hen' %} মুরগি 
+                                    {% elif item.animal.category == 'duck' %} হাঁস 
+                                    {% else %} {{ item.animal.category }} {% endif %}
+                                </td>
+                                <td>{{ item.date }}</td>
                                 <td><span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3">সম্পন্ন</span></td>
                             </tr>
                             {% empty %}
-                            <tr><td colspan="3" class="text-center py-4 text-muted">কোনো হিস্ট্রি পাওয়া যায়নি</td></tr>
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">
+                                    {% if search_query %}
+                                        রেকর্ড পাওয়া যায়নি।
+                                    {% else %}
+                                        তথ্য দেখতে পশুর আইডি লিখে সার্চ দিন।
+                                    {% endif %}
+                                </td>
+                            </tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -308,14 +225,14 @@
 {% for animal in animals %}
 <div class="modal fade" id="vaxModal{{animal.id}}" tabindex="-1">
     <div class="modal-dialog modal-sm modal-dialog-centered">
-        <form action="{% url 'update_vaccine' animal.id %}" method="POST" class="modal-content border-0 rounded-4 overflow-hidden shadow-lg">
+        <form action="{% url 'update_vaccine' animal.id %}" method="POST" class="modal-content border-0 rounded-4 shadow-lg">
             {% csrf_token %}
             <div class="modal-body p-4 text-center">
-                <div class="mb-3 text-primary"><i class="fas fa-syringe fa-3x"></i></div>
+                <i class="fas fa-syringe fa-3x text-primary mb-3"></i>
                 <h5 class="fw-bold">ভ্যাকসিন আপডেট</h5>
                 <p class="small text-muted mb-4">আইডি: {{ animal.tag_id }}</p>
                 <input type="date" name="vaccine_date" class="form-control border-0 bg-light mb-3 p-3 rounded-3" required>
-                <button type="submit" class="btn btn-add w-100">আপডেট নিশ্চিত করুন</button>
+                <button type="submit" class="btn btn-add w-100">সংরক্ষণ করুন</button>
             </div>
         </form>
     </div>
@@ -324,7 +241,7 @@
 
 <div class="modal fade" id="addModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <form method="POST" class="modal-content border-0 rounded-4 overflow-hidden">
+        <form method="POST" class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
             {% csrf_token %}
             <input type="hidden" name="add_animal" value="1">
             <div class="modal-header border-0 bg-light p-4">
@@ -333,28 +250,20 @@
             </div>
             <div class="modal-body p-4">
                 <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label small fw-bold">ট্যাগ আইডি</label>
-                        <input type="text" name="tag_id" class="form-control p-2 border-light bg-light" placeholder="উদা: C-101" required>
-                    </div>
+                    <div class="col-md-6"><label class="form-label small fw-bold">ট্যাগ আইডি</label><input type="text" name="tag_id" class="form-control bg-light border-0" required></div>
                     <div class="col-md-6">
                         <label class="form-label small fw-bold">ধরণ</label>
-                        <select name="category" class="form-select p-2 border-light bg-light">
-                            <option value="cow">গরু (Cow)</option>
-                            <option value="goat">ছাগল (Goat)</option>
-                            <option value="hen">মুরগি (Hen)</option>
-                            <option value="duck">হাঁস (Duck)</option>
+                        <select name="category" class="form-select bg-light border-0">
+                            <option value="cow">গরু</option>
+                            <option value="goat">ছাগল</option>
+                            <option value="hen">মুরগি</option>
+                            <option value="duck">হাঁস</option>
                         </select>
                     </div>
-                    <div class="col-md-12">
-                        <label class="form-label small fw-bold">জাত</label>
-                        <input type="text" name="breed" class="form-control p-2 border-light bg-light" placeholder="উদা: ফ্রিজিয়ান বা ব্রয়লার" required>
-                    </div>
+                    <div class="col-12"><label class="form-label small fw-bold">জাত</label><input type="text" name="breed" class="form-control bg-light border-0" required></div>
                 </div>
             </div>
-            <div class="modal-footer border-0 p-4">
-                <button type="submit" class="btn btn-add w-100">তালিকায় যোগ করুন</button>
-            </div>
+            <div class="modal-footer border-0 p-4"><button type="submit" class="btn btn-add w-100">যোগ করুন</button></div>
         </form>
     </div>
 </div>
