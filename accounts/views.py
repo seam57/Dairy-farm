@@ -237,9 +237,10 @@ def logout_view(request):
 def profile_view(request):
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
     if request.method == "POST":
-        request.user.first_name = request.POST.get('full_name')
+        request.user.first_name = request.POST.get('full_name', '').strip()
         request.user.save()
-        profile.phone = request.POST.get('phone')
+        profile.phone    = request.POST.get('phone', '').strip()
+        profile.location = request.POST.get('location', '').strip()
         profile.save()
-        return redirect('profile_view')
+        return redirect('/profile/?saved=1')
     return render(request, 'accounts/profile.html', {'profile': profile})
