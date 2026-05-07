@@ -1,0 +1,358 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>পশু বিশ্লেষণ | Livestock Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --sidebar-bg:#0f172a; --accent:#10b981; --accent-dark:#059669; --bg:#f1f5f9; --card-radius:20px; }
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body { background:var(--bg); font-family:'Hind Siliguri',sans-serif; color:#1e293b; }
+
+        /* Sidebar */
+        .sidebar { background:var(--sidebar-bg); width:255px; min-height:100vh; position:fixed; top:0; left:0; display:flex; flex-direction:column; z-index:100; }
+        .sidebar-logo { padding:28px 24px 20px; border-bottom:1px solid rgba(255,255,255,0.06); }
+        .sidebar-logo span { font-size:1.15rem; font-weight:700; color:#fff; }
+        .sidebar-logo i { color:var(--accent); margin-right:8px; }
+        .sidebar nav { padding:16px 12px; flex:1; }
+        .nav-link { color:#94a3b8; padding:11px 14px; border-radius:12px; margin-bottom:4px; display:flex; align-items:center; gap:12px; font-size:.95rem; font-weight:500; text-decoration:none; transition:all .2s; }
+        .nav-link i { width:18px; text-align:center; }
+        .nav-link:hover { background:rgba(255,255,255,.07); color:#fff; }
+        .nav-link.active { background:var(--accent); color:#fff; box-shadow:0 4px 14px rgba(16,185,129,.35); }
+        .nav-link.danger { color:#f87171; }
+        .nav-link.danger:hover { background:rgba(248,113,113,.1); }
+        .ai-nav-wrap { margin:6px 0; border:1.5px solid rgba(16,185,129,.35); border-radius:12px; overflow:hidden; }
+        .ai-nav-wrap .nav-link { margin:0; border-radius:0; color:var(--accent); }
+        .sidebar-bottom { padding:12px; border-top:1px solid rgba(255,255,255,.06); }
+
+        /* Main */
+        .main { margin-left:255px; padding:36px 32px; min-height:100vh; }
+        .page-title { font-size:1.6rem; font-weight:700; color:#0f172a; margin-bottom:4px; }
+        .page-sub { color:#64748b; font-size:.9rem; margin-bottom:28px; }
+
+        /* Animal Selector Grid */
+        /* Animal Table */
+        .animal-table { width:100%; border-collapse:separate; border-spacing:0; }
+        .animal-table thead th { background:#f8fafc; color:#94a3b8; font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; padding:10px 16px; border-bottom:1px solid #e2e8f0; }
+        .animal-table tbody tr { cursor:pointer; transition:all .18s; }
+        .animal-table tbody tr:hover { background:#f0fdf4; transform:translateX(3px); }
+        .animal-table tbody tr.selected-row { background:#d1fae5; border-left:3px solid var(--accent); }
+        .animal-table tbody td { padding:13px 16px; border-bottom:1px solid #f1f5f9; font-size:.9rem; vertical-align:middle; }
+        .animal-table tbody tr:last-child td { border-bottom:none; }
+        .a-emoji { font-size:1.3rem; margin-right:6px; }
+        .a-tag-pill { font-family:monospace; font-weight:700; background:#f1f5f9; color:#0f172a; padding:3px 10px; border-radius:7px; font-size:.88rem; }
+        .selected-row .a-tag-pill { background:#fff; }
+        .select-btn { background:var(--accent); color:#fff; border:none; border-radius:8px; padding:6px 14px; font-size:.8rem; font-weight:600; cursor:pointer; font-family:'Hind Siliguri',sans-serif; transition:.2s; }
+        .select-btn:hover { background:var(--accent-dark); }
+        .select-btn.selected-btn { background:#0f172a; }
+        .vax-ok   { background:#d1fae5; color:#065f46; font-size:.7rem; padding:3px 8px; border-radius:20px; font-weight:600; }
+        .vax-due  { background:#fee2e2; color:#991b1b; font-size:.7rem; padding:3px 8px; border-radius:20px; font-weight:600; }
+
+        /* Selected Animal Info */
+        .selected-info {
+            background:linear-gradient(135deg,#064e3b,#10b981);
+            border-radius:var(--card-radius); padding:22px 26px;
+            color:#fff; margin-bottom:20px; display:none;
+        }
+        .selected-info.show { display:block; }
+        .selected-info h6 { font-weight:700; font-size:1rem; margin-bottom:12px; opacity:.9; }
+        .info-chips { display:flex; flex-wrap:wrap; gap:10px; }
+        .chip { background:rgba(255,255,255,.15); border-radius:8px; padding:6px 14px; font-size:.82rem; font-weight:600; }
+        .chip span { opacity:.75; margin-right:4px; }
+
+        /* Problem input */
+        .problem-card { background:#fff; border-radius:var(--card-radius); border:1px solid #e2e8f0; padding:24px; margin-bottom:24px; }
+        .problem-card h5 { font-weight:700; font-size:1rem; margin-bottom:16px; }
+        .problem-textarea {
+            width:100%; border:1.5px solid #e2e8f0; border-radius:12px;
+            padding:14px 16px; font-family:'Hind Siliguri',sans-serif; font-size:.95rem;
+            background:#f8fafc; outline:none; transition:.2s; resize:none; color:#1e293b;
+        }
+        .problem-textarea:focus { border-color:var(--accent); background:#fff; box-shadow:0 0 0 3px rgba(16,185,129,.08); }
+        .problem-textarea::placeholder { color:#c0c8d4; }
+
+        .quick-btns { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 16px; }
+        .quick-btn {
+            background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px;
+            padding:7px 14px; font-size:.82rem; font-family:'Hind Siliguri',sans-serif;
+            cursor:pointer; transition:.2s; color:#475569; font-weight:500;
+        }
+        .quick-btn:hover { background:#f0fdf4; border-color:var(--accent); color:#059669; }
+
+        .btn-analyze {
+            background:var(--accent); color:#fff; border:none; border-radius:13px;
+            padding:13px 28px; font-size:.95rem; font-weight:700;
+            font-family:'Hind Siliguri',sans-serif; cursor:pointer; transition:.2s;
+            display:flex; align-items:center; gap:8px;
+        }
+        .btn-analyze:hover { background:var(--accent-dark); transform:translateY(-1px); }
+        .btn-analyze:disabled { background:#e2e8f0; color:#94a3b8; transform:none; cursor:not-allowed; }
+
+        /* Analysis Result */
+        .result-wrap { display:none; }
+        .result-wrap.show { display:block; }
+
+        .result-header {
+            background:#fff; border-radius:var(--card-radius); border:1px solid #e2e8f0;
+            padding:20px 24px; margin-bottom:16px;
+            display:flex; align-items:center; gap:14px;
+        }
+        .result-avatar {
+            width:52px; height:52px; border-radius:14px;
+            background:linear-gradient(135deg,#064e3b,#10b981);
+            display:flex; align-items:center; justify-content:center;
+            color:#fff; font-size:1.2rem; flex-shrink:0;
+        }
+        .result-animal-name { font-weight:700; font-size:1rem; color:#0f172a; }
+        .result-animal-sub  { font-size:.82rem; color:#64748b; }
+        .analysis-badge { margin-left:auto; background:#f0fdf4; color:#059669; font-size:.78rem; font-weight:700; padding:5px 14px; border-radius:20px; border:1px solid #bbf7d0; }
+
+        .result-body {
+            background:#fff; border-radius:var(--card-radius); border:1px solid #e2e8f0;
+            padding:28px;
+        }
+        .result-body .ai-text { font-size:.93rem; line-height:1.8; color:#1e293b; white-space:pre-wrap; }
+        .result-body .ai-text strong { color:#065f46; }
+
+        /* Loading spinner */
+        .loading-overlay { display:none; text-align:center; padding:48px; background:#fff; border-radius:var(--card-radius); border:1px solid #e2e8f0; }
+        .loading-overlay.show { display:block; }
+        .spinner { width:40px; height:40px; border:3px solid #e2e8f0; border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; margin:0 auto 16px; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+
+        /* Empty state */
+        .empty-state { background:#fff; border-radius:var(--card-radius); border:1px solid #e2e8f0; padding:48px; text-align:center; color:#94a3b8; }
+        .empty-state i { font-size:2.5rem; margin-bottom:16px; display:block; color:#e2e8f0; }
+
+        @media(max-width:768px) { .sidebar{display:none;} .main{margin-left:0;padding:16px;} }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <i class="fas fa-cow"></i><span>LIVESTOCK PRO</span>
+    </div>
+    <nav class="nav flex-column">
+        <a href="{% url 'profile_view' %}"      class="nav-link"><i class="fas fa-user-circle"></i> প্রোফাইল</a>
+        <a href="{% url 'farmer_dashboard' %}"   class="nav-link"><i class="fas fa-th-large"></i> ড্যাশবোর্ড</a>
+        <a href="{% url 'daily_diary' %}"         class="nav-link"><i class="fas fa-chart-pie"></i> এগ্রোট্র্যাক</a>
+        <a href="{% url 'animal_analysis' %}"     class="nav-link active"><i class="fas fa-microscope"></i> পশু বিশ্লেষণ</a>
+        <div class="ai-nav-wrap">
+            <a href="{% url 'farm_ai_doctor' %}" class="nav-link"><i class="fas fa-robot"></i> এআই ডাক্তার</a>
+        </div>
+    </nav>
+    <div class="sidebar-bottom">
+        <a href="{% url 'logout' %}" class="nav-link danger"><i class="fas fa-sign-out-alt"></i> লগআউট</a>
+    </div>
+</div>
+
+<div class="main">
+    <div class="page-title"><i class="fas fa-microscope me-2 text-success"></i>পশু বিশ্লেষণ</div>
+    <p class="page-sub">একটি পশু বেছে নিন — AI তার real data দেখে সমস্যা ও সমাধান বলবে</p>
+
+    <!-- Step 1: Animal Select -->
+    <div style="background:#fff;border-radius:var(--card-radius);border:1px solid #e2e8f0;padding:22px 24px;margin-bottom:20px;">
+        <h5 style="font-weight:700;font-size:1rem;margin-bottom:16px;">
+            <span style="background:#0f172a;color:#fff;border-radius:8px;padding:3px 10px;font-size:.82rem;margin-right:8px;">১</span>
+            কোন পশুর বিশ্লেষণ করবেন?
+        </h5>
+        <!-- Search bar -->
+        <div style="margin-bottom:14px;">
+            <input type="text" id="animalSearch" onkeyup="filterAnimals()"
+                placeholder="🔍 ID বা ধরন দিয়ে খুঁজুন..."
+                style="width:100%;border:1.5px solid #e2e8f0;border-radius:10px;padding:9px 14px;font-family:'Hind Siliguri',sans-serif;font-size:.9rem;background:#f8fafc;outline:none;">
+        </div>
+
+        <div style="border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;">
+            <table class="animal-table" id="animalTable">
+                <thead>
+                    <tr>
+                        <th style="width:50px;"></th>
+                        <th>আইডি</th>
+                        <th>ধরন</th>
+                        <th>জাত</th>
+                        <th>ভ্যাকসিন</th>
+                        <th style="text-align:right;">নির্বাচন</th>
+                    </tr>
+                </thead>
+                <tbody id="animalTbody">
+                {% for animal in animals %}
+                <tr class="animal-row {% if selected_animal and selected_animal.id == animal.id %}selected-row{% endif %}"
+                    data-search="{{ animal.tag_id|lower }} {{ animal.category|lower }}"
+                    onclick="selectAnimal({{ animal.id }}, '{{ animal.tag_id }}', '{{ animal.get_category_display }}', '{{ animal.breed|default:"অজানা" }}', '{{ animal.last_vaccination_date|default:"দেওয়া হয়নি" }}', this)">
+                    <td style="text-align:center;font-size:1.4rem;">
+                        {% if animal.category == 'cow' %}🐄
+                        {% elif animal.category == 'goat' %}🐐
+                        {% elif animal.category == 'hen' %}🐔
+                        {% elif animal.category == 'duck' %}🦆
+                        {% else %}🐾{% endif %}
+                    </td>
+                    <td><span class="a-tag-pill">{{ animal.tag_id }}</span></td>
+                    <td style="color:#475569;">{{ animal.get_category_display }}</td>
+                    <td style="color:#64748b;font-size:.85rem;">{{ animal.breed|default:"—" }}</td>
+                    <td>
+                        {% if animal.last_vaccination_date %}
+                        <span class="vax-ok"><i class="fas fa-check me-1"></i>{{ animal.last_vaccination_date }}</span>
+                        {% else %}
+                        <span class="vax-due"><i class="fas fa-exclamation me-1"></i>বাকি</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align:right;">
+                        <button class="select-btn {% if selected_animal and selected_animal.id == animal.id %}selected-btn{% endif %}"
+                                id="btn-{{ animal.id }}">
+                            {% if selected_animal and selected_animal.id == animal.id %}
+                            ✓ নির্বাচিত{% else %}নির্বাচন করুন{% endif %}
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align:center;padding:36px;color:#94a3b8;font-size:.9rem;">
+                        <i class="fas fa-cow" style="font-size:2rem;margin-bottom:12px;display:block;"></i>
+                        কোনো পশু নেই। ড্যাশবোর্ড থেকে পশু যোগ করুন।
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Selected Animal Info Banner -->
+    <div class="selected-info {% if selected_animal %}show{% endif %}" id="selectedInfo">
+        <h6><i class="fas fa-circle-info me-2"></i>নির্বাচিত পশুর তথ্য (Database থেকে)</h6>
+        <div class="info-chips" id="infoChips">
+            {% if selected_animal %}
+            <div class="chip"><span>আইডি:</span>{{ selected_animal.tag_id }}</div>
+            <div class="chip"><span>জাত:</span>{{ selected_animal.breed|default:"অজানা" }}</div>
+            <div class="chip"><span>ভ্যাকসিন:</span>{{ selected_animal.last_vaccination_date|default:"দেওয়া হয়নি" }}</div>
+            <div class="chip"><span>মোট আয়:</span>৳{{ animal_income|floatformat:0 }}</div>
+            <div class="chip"><span>মোট ব্যয়:</span>৳{{ animal_expense|floatformat:0 }}</div>
+            <div class="chip"><span>নিট লাভ:</span>৳{{ animal_profit|floatformat:0 }}</div>
+            <div class="chip"><span>রেকর্ড সংখ্যা:</span>{{ animal_records }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Step 2: Problem Input -->
+    <div class="problem-card">
+        <h5>
+            <span style="background:#0f172a;color:#fff;border-radius:8px;padding:3px 10px;font-size:.82rem;margin-right:8px;">২</span>
+            সমস্যা বা জিজ্ঞাসা লিখুন (বাংলা/English/Banglish)
+        </h5>
+        <div class="quick-btns">
+            <button class="quick-btn" onclick="setQuery('পশুটা ঠিকমতো খাচ্ছে না')">🍽️ খাচ্ছে না</button>
+            <button class="quick-btn" onclick="setQuery('জ্বর আছে মনে হচ্ছে')">🌡️ জ্বর</button>
+            <button class="quick-btn" onclick="setQuery('দুধ কম দিচ্ছে')">🥛 দুধ কম</button>
+            <button class="quick-btn" onclick="setQuery('পায়ে সমস্যা দেখা যাচ্ছে')">🦵 পায়ে সমস্যা</button>
+            <button class="quick-btn" onclick="setQuery('সামনের মাসে কতটুকু লাভ হতে পারে?')">💰 লাভের পূর্বাভাস</button>
+            <button class="quick-btn" onclick="setQuery('এই পশুর জন্য এখন কী করা উচিত?')">✅ সার্বিক পরামর্শ</button>
+        </div>
+        <form method="POST" id="analysisForm" onsubmit="showLoading()">
+            {% csrf_token %}
+            <input type="hidden" name="animal_id" id="animalIdInput" value="{{ selected_animal.id|default:'' }}">
+            <textarea
+                name="user_problem"
+                id="problemInput"
+                class="problem-textarea"
+                rows="3"
+                placeholder="যেমন: পশুটা ২ দিন ধরে খাচ্ছে না, নাক দিয়ে পানি পড়ছে... অথবা আগামী মাসে লাভ কেমন হবে?"
+            >{{ user_problem|default:'' }}</textarea>
+            <div style="margin-top:14px;">
+                <button type="submit" class="btn-analyze" id="analyzeBtn">
+                    <i class="fas fa-brain"></i> AI দিয়ে বিশ্লেষণ করুন
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div style="font-weight:600;color:#0f172a;margin-bottom:4px;">AI বিশ্লেষণ করছে...</div>
+        <div style="font-size:.85rem;color:#64748b;">পশুর data দেখে সমস্যা খুঁজছে</div>
+    </div>
+
+    <!-- Result -->
+    {% if analysis %}
+    <div class="result-wrap show" id="resultWrap">
+        <div class="result-header">
+            <div class="result-avatar"><i class="fas fa-stethoscope"></i></div>
+            <div>
+                <div class="result-animal-name">{{ selected_animal.tag_id }} — {{ selected_animal.get_category_display }}</div>
+                <div class="result-animal-sub">{{ user_problem }}</div>
+            </div>
+            <span class="analysis-badge"><i class="fas fa-check me-1"></i>বিশ্লেষণ সম্পন্ন</span>
+        </div>
+        <div class="result-body">
+            <div class="ai-text">{{ analysis }}</div>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-state" id="emptyState">
+        <i class="fas fa-microscope"></i>
+        <p>উপরে পশু বেছে নিন এবং সমস্যা লিখুন।<br>
+        AI আপনার পশুর <strong>real data</strong> দেখে বিশ্লেষণ করবে।</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+let selectedId = '{{ selected_animal.id|default:"" }}';
+
+function selectAnimal(id, tagId, type, breed, vaxDate, rowEl) {
+    selectedId = id;
+    document.getElementById('animalIdInput').value = id;
+
+    // Highlight selected row
+    document.querySelectorAll('.animal-row').forEach(r => r.classList.remove('selected-row'));
+    document.querySelectorAll('.select-btn').forEach(b => {
+        b.textContent = 'নির্বাচন করুন';
+        b.classList.remove('selected-btn');
+    });
+    if (rowEl) rowEl.classList.add('selected-row');
+    const btn = document.getElementById('btn-' + id);
+    if (btn) { btn.textContent = '✓ নির্বাচিত'; btn.classList.add('selected-btn'); }
+
+    // Show info banner
+    document.getElementById('selectedInfo').classList.add('show');
+    document.getElementById('infoChips').innerHTML = `
+        <div class="chip"><span>আইডি:</span>${tagId}</div>
+        <div class="chip"><span>ধরন:</span>${type}</div>
+        <div class="chip"><span>জাত:</span>${breed}</div>
+        <div class="chip"><span>ভ্যাকসিন:</span>${vaxDate}</div>
+        <div class="chip" style="opacity:.7"><span>আয়/ব্যয়:</span>submit করলে দেখাবে</div>
+    `;
+}
+
+function filterAnimals() {
+    const q = document.getElementById('animalSearch').value.toLowerCase();
+    document.querySelectorAll('.animal-row').forEach(row => {
+        const text = row.dataset.search || '';
+        row.style.display = text.includes(q) ? '' : 'none';
+    });
+}
+
+function setQuery(text) {
+    document.getElementById('problemInput').value = text;
+    document.getElementById('problemInput').focus();
+}
+
+function showLoading() {
+    if (!selectedId) {
+        alert('আগে একটি পশু নির্বাচন করুন!');
+        return false;
+    }
+    document.getElementById('loadingOverlay').classList.add('show');
+    document.getElementById('emptyState') && (document.getElementById('emptyState').style.display='none');
+    document.getElementById('analyzeBtn').disabled = true;
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

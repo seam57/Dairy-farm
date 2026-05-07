@@ -1,32 +1,184 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Livestock Pro{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
-        .sidebar { background: #1a252f; min-height: 100vh; color: white; position: fixed; width: 250px; z-index: 1000; padding: 20px; }
-        .nav-link { color: #95a5a6; padding: 12px; border-radius: 8px; transition: 0.3s; margin-bottom: 5px; }
-        .nav-link:hover, .nav-link.active { background: #2c3e50; color: white; opacity: 1; }
-        .main-content { margin-left: 250px; padding: 30px; width: calc(100% - 250px); }
-        .custom-card { border: none; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); background: white; margin-bottom: 25px; padding: 20px; }
-        .ai-doctor-btn { border: 2px solid #2ecc71; border-radius: 10px; margin-top: 10px; transition: 0.3s; }
-        .ai-doctor-btn:hover { background: rgba(46, 204, 113, 0.1); }
-
-        @media (max-width: 992px) {
-            .sidebar { position: relative; width: 100%; min-height: auto; height: auto; }
-            .sidebar nav { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-            .sidebar .nav-link { margin: 4px 0; }
-            .main-content { margin-left: 0; width: 100%; padding: 20px; }
+        :root {
+            --sidebar-bg: #0f172a;
+            --accent: #10b981;
+            --accent-dark: #059669;
+            --purple: #7c3aed;
+            --bg: #f1f5f9;
+        }
+        * { box-sizing: border-box; }
+        body {
+            background: var(--bg);
+            font-family: 'Hind Siliguri', 'Segoe UI', sans-serif;
+            color: #1e293b;
         }
 
+        /* ── Sidebar ── */
+        .sidebar {
+            background: var(--sidebar-bg);
+            min-height: 100vh;
+            color: white;
+            position: fixed;
+            width: 255px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+        }
+        .sidebar-logo {
+            padding: 24px 20px 18px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sidebar-logo i { color: var(--accent); font-size: 1.2rem; }
+        .sidebar-logo span { font-size: 1.05rem; font-weight: 700; color: #fff; letter-spacing: 0.5px; }
+
+        .sidebar nav { padding: 14px 12px; flex: 1; }
+
+        /* Regular nav links */
+        .nav-link {
+            color: #94a3b8;
+            padding: 11px 14px;
+            border-radius: 12px;
+            margin-bottom: 3px;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            font-size: 0.93rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .nav-link i { width: 18px; text-align: center; font-size: 0.9rem; flex-shrink: 0; }
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: var(--accent);
+            border-radius: 0 3px 3px 0;
+            transform: scaleY(0);
+            transition: transform 0.2s ease;
+        }
+        .nav-link:hover {
+            background: rgba(255,255,255,0.07);
+            color: #fff;
+            transform: translateX(3px);
+        }
+        .nav-link:hover::before { transform: scaleY(1); }
+        .nav-link.active {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(16,185,129,0.35);
+            transform: none;
+        }
+        .nav-link.active::before { display: none; }
+        .nav-link.active:hover { transform: none; }
+
+        /* AI Doctor special button */
+        .ai-doctor-wrap {
+            margin: 8px 0 4px;
+            border: 1.5px solid rgba(16,185,129,0.35);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .ai-doctor-wrap:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 12px rgba(16,185,129,0.2);
+        }
+        .ai-doctor-wrap .nav-link {
+            margin: 0;
+            border-radius: 0;
+            color: var(--accent);
+        }
+        .ai-doctor-wrap .nav-link:hover {
+            background: rgba(16,185,129,0.1);
+            color: var(--accent);
+            transform: none;
+        }
+        .ai-doctor-wrap .nav-link.active {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        /* Animal Analysis special button */
+        .analysis-wrap {
+            margin: 4px 0 8px;
+            border: 1.5px solid rgba(124,58,237,0.35);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .analysis-wrap:hover {
+            border-color: var(--purple);
+            box-shadow: 0 0 12px rgba(124,58,237,0.2);
+        }
+        .analysis-wrap .nav-link {
+            margin: 0;
+            border-radius: 0;
+            color: var(--purple);
+        }
+        .analysis-wrap .nav-link:hover {
+            background: rgba(124,58,237,0.1);
+            color: var(--purple);
+            transform: none;
+        }
+        .analysis-wrap .nav-link.active {
+            background: var(--purple);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(124,58,237,0.35);
+        }
+
+        .sidebar-bottom {
+            padding: 12px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .nav-link.danger { color: #f87171; }
+        .nav-link.danger:hover { background: rgba(248,113,113,0.1); color: #f87171; }
+        .nav-link.danger::before { background: #f87171; }
+
+        /* ── Main Content ── */
+        .main-content {
+            margin-left: 255px;
+            padding: 32px;
+            width: calc(100% - 255px);
+            min-height: 100vh;
+        }
+        .custom-card {
+            border: none;
+            border-radius: 18px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+            background: white;
+            margin-bottom: 24px;
+            padding: 22px;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 992px) {
+            .sidebar { position: relative; width: 100%; min-height: auto; height: auto; flex-direction: row; flex-wrap: wrap; }
+            .sidebar-logo { width: 100%; padding: 14px 16px; }
+            .sidebar nav { padding: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+            .ai-doctor-wrap, .analysis-wrap { margin: 0; }
+            .sidebar-bottom { padding: 8px; display: flex; }
+            .main-content { margin-left: 0; width: 100%; padding: 16px; }
+        }
         @media (max-width: 576px) {
-            .sidebar { padding: 15px; }
-            .main-content { padding: 15px; }
+            .main-content { padding: 12px; }
         }
     </style>
     {% block extra_css %}{% endblock %}
@@ -34,26 +186,45 @@
 <body>
 
 <div class="sidebar">
-    <h4 class="fw-bold mb-4 text-center text-success border-bottom pb-3">LIVESTOCK PRO</h4>
+    <div class="sidebar-logo">
+        <i class="fas fa-cow"></i>
+        <span>LIVESTOCK PRO</span>
+    </div>
     <nav class="nav flex-column">
-        <a href="{% url 'profile_view' %}" class="nav-link {% if request.resolver_match.url_name == 'profile_view' %}active{% endif %}">
-            <i class="fas fa-user-circle me-2"></i> Profile
+        <a href="{% url 'profile_view' %}"
+           class="nav-link {% if request.resolver_match.url_name == 'profile_view' %}active{% endif %}">
+            <i class="fas fa-user-circle"></i> প্রোফাইল
         </a>
-        <a href="{% url 'farmer_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'farmer_dashboard' %}active{% endif %}">
-            <i class="fas fa-th-large me-2"></i> Dashboard
+        <a href="{% url 'farmer_dashboard' %}"
+           class="nav-link {% if request.resolver_match.url_name == 'farmer_dashboard' %}active{% endif %}">
+            <i class="fas fa-th-large"></i> ড্যাশবোর্ড
         </a>
-        <a href="{% url 'daily_diary' %}" class="nav-link {% if request.resolver_match.url_name == 'daily_diary' %}active{% endif %}">
-            <i class="fas fa-history me-2"></i> AgroTrack
+        <a href="{% url 'daily_diary' %}"
+           class="nav-link {% if request.resolver_match.url_name == 'daily_diary' %}active{% endif %}">
+            <i class="fas fa-chart-pie"></i> এগ্রোট্র্যাক
         </a>
-        <div class="ai-doctor-btn">
-            <a href="{% url 'farm_ai_doctor' %}" class="nav-link text-success fw-bold {% if request.resolver_match.url_name == 'farm_ai_doctor' %}active{% endif %}">
-                <i class="fas fa-robot me-2"></i> AI Doctor
+
+        <!-- AI Doctor -->
+        <div class="ai-doctor-wrap">
+            <a href="{% url 'farm_ai_doctor' %}"
+               class="nav-link {% if request.resolver_match.url_name == 'farm_ai_doctor' %}active{% endif %}">
+                <i class="fas fa-robot"></i> এআই ডাক্তার
             </a>
         </div>
-        <a href="{% url 'logout' %}" class="nav-link mt-5 text-danger">
-            <i class="fas fa-power-off me-2"></i> Logout
-        </a>
+
+        <!-- Animal Analysis -->
+        <div class="analysis-wrap">
+            <a href="{% url 'animal_analysis' %}"
+               class="nav-link {% if request.resolver_match.url_name == 'animal_analysis' %}active{% endif %}">
+                <i class="fas fa-microscope"></i> পশু বিশ্লেষণ
+            </a>
+        </div>
     </nav>
+    <div class="sidebar-bottom">
+        <a href="{% url 'logout' %}" class="nav-link danger">
+            <i class="fas fa-sign-out-alt"></i> লগআউট
+        </a>
+    </div>
 </div>
 
 <div class="main-content">

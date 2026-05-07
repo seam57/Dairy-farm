@@ -1,7 +1,7 @@
 django
 gunicorn
 whitenoise
-google-generativeai
+groq
 python-dotenv
 dj-database-url
 psycopg2-binary
