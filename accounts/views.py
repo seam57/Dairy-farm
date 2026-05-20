@@ -14,6 +14,57 @@ from decimal import Decimal
 # আপনার মডেলগুলো ইমপোর্ট করা হচ্ছে
 from .models import UserProfile, Animal, DailyFarmDiary, HealthConsultation, VaccinationRecord
 
+# --- RAG System ---
+import json as _json
+
+def _search_rag(query: str, animal_filter: str = None, n: int = 3) -> list:
+    """Veterinary knowledge base থেকে relevant তথ্য খোঁজে"""
+    RAG_DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'vet_rag_db.json')
+    if not os.path.exists(RAG_DB_PATH):
+        return []
+    with open(RAG_DB_PATH, 'r', encoding='utf-8') as f:
+        db = _json.load(f)
+    query_lower = query.lower()
+    query_words = set(query_lower.split())
+    scored = []
+    for doc in db:
+        score = 0
+        text = doc.get('full_text', '')
+        animal_map = {'cow':'গরু','goat':'ছাগল','hen':'মুরগি','duck':'হাঁস'}
+        if animal_filter:
+            bn = animal_map.get(animal_filter, animal_filter)
+            if bn in text or animal_filter in text:
+                score += 5
+        for word in query_words:
+            if len(word) > 1 and word in text:
+                score += 2
+        if query_lower in text:
+            score += 10
+        for kw in ['জ্বর','কাশি','ডায়রিয়া','দুধ','ফোলা','ঘা','রক্ত','দুর্বল','খাচ্ছে','ভ্যাকসিন','fever','cough','milk','weak','blood','লালা','পায়ে','মৃত্যু']:
+            if kw in query_lower and kw in text:
+                score += 3
+        if score > 0:
+            scored.append((score, doc))
+    scored.sort(key=lambda x: -x[0])
+    return [doc for _, doc in scored[:n]]
+
+def _build_rag_context(results: list) -> str:
+    """RAG results থেকে AI-এর জন্য context তৈরি করে"""
+    if not results:
+        return ""
+    context = "\n\n═══ প্রাসঙ্গিক ভেটেরিনারি জ্ঞানভাণ্ডার (RAG) ═══\n"
+    for i, doc in enumerate(results, 1):
+        context += f"""
+[তথ্য {i}] {doc['title']}
+পশু: {doc['animal']} | জরুরিত্ব: {doc['urgency']}
+লক্ষণ: {doc['symptoms']}
+চিকিৎসা: {doc['treatment']}
+প্রতিরোধ: {doc['prevention']}
+ভ্যাকসিন: {doc['vaccine']}
+"""
+    context += "═══════════════════════════════════════════\n"
+    return context
+
 # --- Groq AI Configuration ---
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(BASE_DIR, '.env'))
@@ -251,7 +302,11 @@ def farm_ai_doctor(request):
         )
 
         try:
-            full_prompt = SYSTEM_PROMPT + "\n\nকৃষকের প্রশ্ন: " + user_query
+            # RAG — knowledge base থেকে relevant তথ্য খোঁজা
+            rag_results = _search_rag(user_query, n=3)
+            rag_context = _build_rag_context(rag_results)
+
+            full_prompt = SYSTEM_PROMPT + rag_context + "\n\nকৃষকের প্রশ্ন: " + user_query
             if user_image:
                 import tempfile
                 suffix = '.' + user_image.name.split('.')[-1]
@@ -493,8 +548,17 @@ def animal_analysis_view(request):
                 selected_animal.category, selected_animal.category
             )
 
-            # ── Gemini Prompt ──
+            # ── RAG — knowledge base থেকে relevant তথ্য ──
+            rag_results = _search_rag(
+                user_problem,
+                animal_filter=selected_animal.category,
+                n=3
+            )
+            rag_context = _build_rag_context(rag_results)
+
+            # ── AI Prompt ──
             prompt = f"""তুমি একজন অভিজ্ঞ ভেটেরিনারি ডাক্তার এবং কৃষি অর্থনীতিবিদ।
+নিচের RAG knowledge base থেকে প্রাসঙ্গিক তথ্য ব্যবহার করো:{rag_context}
 নিচে একটি পশুর real database থেকে নেওয়া তথ্য দেওয়া আছে। এই তথ্যের ভিত্তিতে কৃষকের প্রশ্নের উত্তর দাও।
 
 ═══ পশুর তথ্য ═══
