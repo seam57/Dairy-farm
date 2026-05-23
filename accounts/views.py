@@ -104,28 +104,29 @@ def groq_chat(prompt, image_path=None):
 # --- Farmer Dashboard ---
 @login_required
 def farmer_dashboard(request):
+    error_message = None
+
     if request.method == "POST" and 'add_animal' in request.POST:
-        tag = request.POST.get('tag_id')
+        tag = request.POST.get('tag_id', '').strip()
         cat = request.POST.get('category')
-        brd = request.POST.get('breed')
+        brd = request.POST.get('breed', '').strip()
         if tag and cat:
-            Animal.objects.create(owner=request.user, tag_id=tag, category=cat, breed=brd)
-            return redirect('farmer_dashboard')
+            if Animal.objects.filter(tag_id=tag).exists():
+                error_message = f'❌ ট্যাগ আইডি "{tag}" আগে থেকেই আছে। অন্য একটি আইডি দিন।'
+            else:
+                Animal.objects.create(owner=request.user, tag_id=tag, category=cat, breed=brd)
+                return redirect('farmer_dashboard')
 
     animals = Animal.objects.filter(owner=request.user)
     search_query = request.GET.get('search_id', '').strip()
 
-    # শুরুতে হিস্ট্রি লিস্ট খালি থাকবে
     vaccination_history_list = []
-
-    # শুধুমাত্র সার্চ বাটনে ক্লিক করলে ডাটা আসবে
     if search_query:
         vaccination_history_list = VaccinationRecord.objects.filter(
             animal__owner=request.user,
             animal__tag_id__iexact=search_query
         ).order_by('-date')
 
-    # ── NEW: Dashboard summary card data ──
     vaccinated_count   = animals.filter(last_vaccination_date__isnull=False).count()
     unvaccinated_count = animals.filter(last_vaccination_date__isnull=True).count()
     total_diary_records = DailyFarmDiary.objects.filter(farmer=request.user).count()
@@ -134,10 +135,10 @@ def farmer_dashboard(request):
         'animals': animals,
         'vaccination_history_list': vaccination_history_list,
         'search_query': search_query,
-        # NEW variables for summary cards
         'vaccinated_count': vaccinated_count,
         'unvaccinated_count': unvaccinated_count,
         'total_diary_records': total_diary_records,
+        'error_message': error_message,
     })
 
 
@@ -182,6 +183,17 @@ def diet_planner_view(request):
             response_text = "AI সার্ভিস এখন ব্যস্ত।"
     return render(request, 'dashboards/diet_planner.html', {'response': response_text})
 
+
+
+# --- Delete Animal ---
+@login_required
+def delete_animal_view(request, animal_id):
+    animal = get_object_or_404(Animal, id=animal_id, owner=request.user)
+    if request.method == "POST":
+        DailyFarmDiary.objects.filter(animal=animal).delete()
+        VaccinationRecord.objects.filter(animal=animal).delete()
+        animal.delete()
+    return redirect('farmer_dashboard')
 
 # --- AgroTrack/Diary ---
 @login_required
@@ -321,10 +333,10 @@ def farm_ai_doctor(request):
         except Exception as e:
             error_msg = str(e)
             print(f"[AI DOCTOR ERROR]: {error_msg}")  # terminal এ দেখাবে
-            if "API_KEY" in error_msg or "api_key" in error_msg or "credential" in error_msg.lower():
-                response_text = "❌ GEMINI_API_KEY সমস্যা। .env ফাইলে সঠিক key আছে কিনা চেক করুন।"
+            if "api_key" in error_msg.lower() or "authentication" in error_msg.lower() or "credential" in error_msg.lower():
+                response_text = "❌ GROQ_API_KEY সমস্যা। .env ফাইলে সঠিক GROQ_API_KEY আছে কিনা চেক করুন।"
             elif "quota" in error_msg.lower() or "limit" in error_msg.lower():
-                response_text = "⚠️ API quota শেষ হয়ে গেছে। Google AI Studio থেকে চেক করুন।"
+                response_text = "⚠️ API quota শেষ। কিছুক্ষণ পর আবার চেষ্টা করুন।"
             elif "network" in error_msg.lower() or "connection" in error_msg.lower():
                 response_text = "⚠️ Internet সংযোগ সমস্যা। নেটওয়ার্ক চেক করুন।"
             else:
@@ -339,17 +351,18 @@ def farm_ai_doctor(request):
 
 
 # --- AI Debug View (development only) ---
+@login_required
 def ai_debug_view(request):
     """শুধু development এ use করুন — API key check করতে"""
     from django.http import HttpResponse
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     env_path = os.path.join(BASE_DIR, '.env')
-    key = os.environ.get('GEMINI_API_KEY', 'NOT FOUND')
+    key = os.environ.get('GROQ_API_KEY', 'NOT FOUND')
     env_exists = os.path.exists(env_path)
     msg = f"""
     ENV file exists: {env_exists}
     ENV path: {env_path}
-    API KEY found: {'YES - ' + key[:10] + '...' if key != 'NOT FOUND' else 'NO'}
+    GROQ_API_KEY found: {'YES - ' + key[:10] + '...' if key != 'NOT FOUND' else 'NO'}
     """
     return HttpResponse(f"<pre>{msg}</pre>")
 
@@ -496,6 +509,104 @@ def ml_prediction_view(request):
     })
 
 
+
+
+# --- AI Financial Prediction (Groq দিয়ে) ---
+@login_required
+def ai_prediction_view(request):
+    from django.db.models import Sum
+
+    animals = Animal.objects.filter(owner=request.user)
+    animals_count = animals.count()
+    history = DailyFarmDiary.objects.filter(farmer=request.user).order_by('-date')
+    total_records = history.count()
+
+    all_totals = history.aggregate(
+        ti=Sum('milk_income'), tm=Sum('meat_income'), te=Sum('egg_income'),
+        tf=Sum('feed_cost'), tmed=Sum('medicine_cost'), to=Sum('other_cost')
+    )
+    total_income  = float((all_totals['ti'] or 0)+(all_totals['tm'] or 0)+(all_totals['te'] or 0))
+    total_expense = float((all_totals['tf'] or 0)+(all_totals['tmed'] or 0)+(all_totals['to'] or 0))
+    net_profit    = total_income - total_expense
+
+    recent_rows = []
+    for r in list(history[:7]):
+        recent_rows.append(
+            f"  {r.date}: আয়=৳{float(r.total_income):,.0f}, ব্যয়=৳{float(r.total_expense):,.0f}, লাভ=৳{float(r.net_profit):,.0f}"
+        )
+
+    animal_roi_rows = []
+    for animal in animals:
+        recs = history.filter(animal=animal)
+        if recs.exists():
+            agg = recs.aggregate(
+                mi=Sum('milk_income'), mt=Sum('meat_income'), ei=Sum('egg_income'),
+                fc=Sum('feed_cost'), mc=Sum('medicine_cost'), oc=Sum('other_cost')
+            )
+            inc = float((agg['mi'] or 0)+(agg['mt'] or 0)+(agg['ei'] or 0))
+            exp = float((agg['fc'] or 0)+(agg['mc'] or 0)+(agg['oc'] or 0))
+            animal_roi_rows.append(
+                f"  {animal.tag_id}({animal.category}): আয়=৳{inc:,.0f} ব্যয়=৳{exp:,.0f} লাভ=৳{inc-exp:,.0f}"
+            )
+
+    prediction_raw = None
+    error = None
+    has_data = total_records > 0
+
+    if request.method == 'POST':
+        if not has_data:
+            error = "এখনো কোনো diary রেকর্ড নেই। আগে AgroTrack Diary-তে data যোগ করুন।"
+        else:
+            prompt = f"""তুমি একজন কৃষি অর্থনীতিবিদ।
+নিচের বাংলাদেশি ডেইরি ফার্মের real data দেখে আগামী মাসের prediction দাও।
+
+মোট পশু: {animals_count}টি
+মোট রেকর্ড: {total_records}টি
+সর্বমোট আয়: ৳{total_income:,.0f}
+সর্বমোট ব্যয়: ৳{total_expense:,.0f}
+সর্বমোট লাভ: ৳{net_profit:,.0f}
+
+সাম্প্রতিক ৭টি রেকর্ড:
+{chr(10).join(recent_rows) if recent_rows else "  কোনো রেকর্ড নেই"}
+
+পশু ভিত্তিক ROI:
+{chr(10).join(animal_roi_rows) if animal_roi_rows else "  কোনো পশু নেই"}
+
+নিচের format-এ বাংলায় উত্তর দাও:
+
+📊 বর্তমান অবস্থা:
+[সংক্ষিপ্ত বিশ্লেষণ]
+
+📈 আগামী মাসের পূর্বাভাস:
+আনুমানিক আয়: ৳[সংখ্যা]
+আনুমানিক ব্যয়: ৳[সংখ্যা]
+আনুমানিক লাভ: ৳[সংখ্যা]
+ট্রেন্ড: [বাড়বে/কমবে/স্থিতিশীল]
+
+⚠️ ঝুঁকি:
+[২-৩টি bullet point]
+
+✅ পরামর্শ:
+[৩-৪টি bullet point]
+
+💡 সেরা সুযোগ:
+[১টি focus area]"""
+            try:
+                prediction_raw = groq_chat(prompt)
+            except Exception as e:
+                error = f"AI সংযোগ সমস্যা: {str(e)[:200]}"
+
+    return render(request, 'dashboards/prediction.html', {
+        'prediction_raw': prediction_raw,
+        'error': error,
+        'has_data': has_data,
+        'total_income': total_income,
+        'total_expense': total_expense,
+        'net_profit': net_profit,
+        'total_records': total_records,
+        'animals_count': animals_count,
+    })
+
 # --- Animal Analysis (AI + Real Data) ---
 @login_required
 def animal_analysis_view(request):
@@ -623,7 +734,11 @@ def login_view(request):
     if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
-            login(request, form.get_user())
+            user = form.get_user()
+            login(request, user)
+            profile = UserProfile.objects.filter(user=user).first()
+            if profile and profile.role == 'doctor':
+                return redirect('doctor_dashboard')
             return redirect('farmer_dashboard')
     else:
         form = AuthenticationForm()

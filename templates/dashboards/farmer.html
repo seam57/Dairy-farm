@@ -75,6 +75,7 @@
                 </div>
                 <div class="mt-2" style="border:1.5px solid rgba(124,58,237,0.4);border-radius:10px;">
                     <a href="{% url 'animal_analysis' %}" class="nav-link {% if request.resolver_match.url_name == 'animal_analysis' %}active{% endif %}" style="color:#7c3aed;"><i class="fas fa-microscope me-2"></i>পশু বিশ্লেষণ</a>
+                    <a href="{% url 'ai_prediction' %}" class="nav-link {% if request.resolver_match.url_name == 'ai_prediction' %}active{% endif %}" style="color:#f59e0b;"><i class="fas fa-chart-line me-2"></i>AI পূর্বাভাস</a>
                 </div>
                 <a href="{% url 'logout' %}" class="nav-link mt-4 text-danger"><i class="fas fa-sign-out-alt me-2"></i>লগআউট</a>
             </nav>
@@ -262,6 +263,11 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-4">
+                {% if error_message %}
+                <div style="background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:10px 14px;border-radius:10px;margin-bottom:14px;font-size:0.88rem;display:flex;align-items:center;gap:8px;">
+                    <i class="fas fa-exclamation-circle"></i> {{ error_message }}
+                </div>
+                {% endif %}
                 <div class="row g-3">
                     <div class="col-md-6"><label class="form-label small fw-bold">ট্যাগ আইডি</label><input type="text" name="tag_id" class="form-control bg-light border-0" required></div>
                     <div class="col-md-6">
@@ -282,5 +288,15 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+{% if error_message %}
+document.addEventListener('DOMContentLoaded', function() {
+    var modal = new bootstrap.Modal(document.getElementById('addModal'));
+    modal.show();
+});
+{% endif %}
+</script>
+
 </body>
 </html>

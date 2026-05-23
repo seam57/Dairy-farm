@@ -142,6 +142,7 @@
         <a href="{% url 'farmer_dashboard' %}"   class="nav-link"><i class="fas fa-th-large"></i> ড্যাশবোর্ড</a>
         <a href="{% url 'daily_diary' %}"         class="nav-link"><i class="fas fa-chart-pie"></i> এগ্রোট্র্যাক</a>
         <a href="{% url 'animal_analysis' %}"     class="nav-link active"><i class="fas fa-microscope"></i> পশু বিশ্লেষণ</a>
+        <a href="{% url 'ai_prediction' %}"     class="nav-link {% if request.resolver_match.url_name == 'ai_prediction' %}active{% endif %}" style="color:#f59e0b;"><i class="fas fa-chart-line"></i> AI পূর্বাভাস</a>
         <div class="ai-nav-wrap">
             <a href="{% url 'farm_ai_doctor' %}" class="nav-link"><i class="fas fa-robot"></i> এআই ডাক্তার</a>
         </div>

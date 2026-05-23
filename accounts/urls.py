@@ -10,7 +10,9 @@ urlpatterns = [
     path('diary/', views.daily_diary_view, name='daily_diary'),
     path('farm-ai/', views.farm_ai_doctor, name='farm_ai_doctor'),
     path('update-vaccine/<int:animal_id>/', views.update_vaccine, name='update_vaccine'),
+    path('delete-animal/<int:animal_id>/', views.delete_animal_view, name='delete_animal'),
     path('profile/', views.profile_view, name='profile_view'),
     path('animal-analysis/', views.animal_analysis_view, name='animal_analysis'),
+    path('ai-prediction/', views.ai_prediction_view, name='ai_prediction'),  # নতুন AI prediction
     path('ai-debug/', views.ai_debug_view, name='ai_debug'),
 ]

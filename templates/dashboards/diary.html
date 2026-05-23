@@ -47,6 +47,7 @@
                 </div>
                 <div class="mt-2" style="border:1.5px solid rgba(124,58,237,0.4);border-radius:10px;">
                     <a href="{% url 'animal_analysis' %}" class="nav-link {% if request.resolver_match.url_name == 'animal_analysis' %}active{% endif %}" style="color:#7c3aed;"><i class="fas fa-microscope me-2"></i>পশু বিশ্লেষণ</a>
+                    <a href="{% url 'ai_prediction' %}" class="nav-link {% if request.resolver_match.url_name == 'ai_prediction' %}active{% endif %}" style="color:#f59e0b;"><i class="fas fa-chart-line me-2"></i>AI পূর্বাভাস</a>
                 </div>
                 <a href="{% url 'logout' %}" class="nav-link mt-4 text-danger"><i class="fas fa-sign-out-alt me-2"></i>লগআউট</a>
             </nav>

@@ -12,211 +12,219 @@
         :root {
             --primary-color: #2ecc71;
             --secondary-color: #27ae60;
-            --ai-bubble-bg: #ffffff;
-            --user-bubble-bg: linear-gradient(135deg, #2ecc71, #27ae60);
             --bg-color: #f0f2f5;
         }
+        body { background-color: var(--bg-color); font-family: 'Outfit', sans-serif; margin: 0; }
 
-        body { 
-            background-color: var(--bg-color); 
-            font-family: 'Outfit', sans-serif; 
-            margin: 0;
-        }
-        
-        .sidebar { 
-            height: 100vh; width: 250px; position: fixed; 
-            background: #1a252f; color: white; padding: 20px; z-index: 1000;
-        }
-
-        .nav-link { 
-            color: #bdc3c7; margin-bottom: 12px; padding: 12px 15px; 
-            border-radius: 10px; text-decoration: none; display: block; transition: 0.3s;
-        }
-
+        /* ── Sidebar ── */
+        .sidebar { height: 100vh; width: 250px; position: fixed; background: #1a252f; color: white; padding: 20px; z-index: 1000; }
+        .nav-link { color: #bdc3c7; margin-bottom: 12px; padding: 12px 15px; border-radius: 10px; text-decoration: none; display: block; transition: 0.3s; }
         .nav-link:hover, .nav-link.active { background: var(--primary-color); color: white; }
-
-        .main-content { margin-left: 250px; height: 100vh; padding: 20px; display: flex; flex-direction: column; }
-
-        .chat-container {
-            flex: 1; background: white; border-radius: 20px; 
-            display: flex; flex-direction: column; overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-        }
-
-        @media (max-width: 992px) {
-            .sidebar { position: relative; width: 100%; height: auto; min-height: auto; }
-            .main-content { margin-left: 0; width: 100%; height: auto; padding: 15px; }
-            .chat-container { height: auto; }
-            .chat-header, .chat-input-area { padding: 15px; }
-        }
-
-        @media (max-width: 576px) {
-            .sidebar { padding: 15px; }
-            .chat-messages { padding: 15px; }
-            .input-group-custom { flex-direction: column; gap: 10px; }
-            .send-btn { width: 100%; }
-        }
-
-        /* Header Area */
-        .chat-header {
-            padding: 15px 25px; border-bottom: 1px solid #eee;
-            display: flex; align-items: center; justify-content: space-between;
-            background: white;
-        }
-
-        /* Chat Window */
-        .chat-messages {
-            flex: 1; padding: 25px; overflow-y: auto;
-            background: #f9fbff; display: flex; flex-direction: column; gap: 15px;
-        }
-
-        /* Message Bubbles Style */
-        .message {
-            max-width: 80%; padding: 12px 18px; border-radius: 18px;
-            font-size: 0.95rem; line-height: 1.6; position: relative;
-            animation: fadeIn 0.4s ease;
-        }
-
-        .message-ai {
-            align-self: flex-start; background: var(--ai-bubble-bg);
-            color: #333; border: 1px solid #e1e8ed;
-            border-bottom-left-radius: 4px;
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.02);
-        }
-
-        .message-user {
-            align-self: flex-end; background: var(--user-bubble-bg);
-            color: white; border-bottom-right-radius: 4px;
-            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.2);
-        }
-
-        /* AI Formatting (Bold, Lists) */
-        .message-ai strong { color: #1a252f; font-weight: 600; }
-        .message-ai p { margin-bottom: 8px; }
-
-        /* Input Area */
-        .chat-input-area { padding: 20px; border-top: 1px solid #eee; background: white; }
-
-        .input-group-custom {
-            display: flex; align-items: center; background: #f0f2f5;
-            padding: 8px 15px; border-radius: 30px; border: 1px solid transparent;
-            transition: 0.3s;
-        }
-
-        .input-group-custom:focus-within {
-            background: #fff; border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(46, 204, 113, 0.1);
-        }
-
-        .chat-textarea {
-            flex: 1; border: none; background: transparent;
-            outline: none; padding: 10px; resize: none; max-height: 100px;
-        }
-
-        .icon-btn {
-            background: none; border: none; color: #7f8c8d;
-            font-size: 1.2rem; cursor: pointer; padding: 5px 10px;
-            transition: 0.2s;
-        }
-
-        .icon-btn:hover { color: var(--primary-color); }
-
-        .send-btn {
-            background: var(--primary-color); color: white;
-            width: 45px; height: 45px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            border: none; margin-left: 10px; transition: 0.3s;
-        }
-
-        .send-btn:hover { background: var(--secondary-color); transform: scale(1.05); }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        #file-preview { font-size: 0.8rem; color: #e67e22; margin-top: 5px; display: none; }
-    
-        /* ── Sidebar nav hover animations ── */
-        .sidebar .nav-link { transition: all 0.2s ease; border-radius: 10px; }
+        .sidebar .nav-link { transition: all 0.2s ease; }
         .sidebar .nav-link:hover { background: rgba(255,255,255,0.08) !important; color: #fff !important; transform: translateX(4px); }
         .sidebar .nav-link.active { background: #10b981 !important; color: #fff !important; box-shadow: 0 4px 14px rgba(16,185,129,0.3); transform: none; }
-        .ai-doctor-btn { border: 1.5px solid rgba(16,185,129,0.4); border-radius: 10px; transition: border-color 0.2s, box-shadow 0.2s; }
-        .ai-doctor-btn:hover { border-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.2); }
-        .sidebar .nav-link[style*="7c3aed"]:hover { background: rgba(124,58,237,0.12) !important; color: #7c3aed !important; }
-        .sidebar .nav-link[style*="7c3aed"].active { background: #7c3aed !important; color: #fff !important; }
+        .ai-doctor-btn { border: 1.5px solid rgba(16,185,129,0.4); border-radius: 10px; transition: border-color 0.2s; }
+        .ai-doctor-btn:hover { border-color: #10b981; }
+
+        /* ── Main ── */
+        .main-content { margin-left: 250px; height: 100vh; padding: 20px; display: flex; flex-direction: column; }
+        .chat-container { flex: 1; background: white; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+
+        /* ── Header ── */
+        .chat-header { padding: 15px 25px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; background: white; }
+
+        /* ── Chat window ── */
+        .chat-messages { flex: 1; padding: 25px; overflow-y: auto; background: #0a0f1e; display: flex; flex-direction: column; gap: 15px; position: relative; }
+        #nn-canvas { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+        .chat-messages > *:not(#nn-canvas) { position: relative; z-index: 1; }
+
+        /* ── Bubbles ── */
+        .message { max-width: 80%; padding: 12px 18px; border-radius: 18px; font-size: 0.95rem; line-height: 1.6; animation: fadeIn 0.4s ease; }
+        .message-ai { align-self: flex-start; background: rgba(255,255,255,0.08); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.12); backdrop-filter: blur(8px); border-bottom-left-radius: 4px; }
+        .message-user { align-self: flex-end; background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; border-bottom-right-radius: 4px; box-shadow: 0 4px 12px rgba(46,204,113,0.25); }
+
+        /* ── Image preview inside chat ── */
+        .img-bubble { align-self: flex-end; position: relative; z-index: 1; }
+        .img-bubble img { max-width: 220px; max-height: 180px; border-radius: 14px; border: 2px solid rgba(46,204,113,0.5); display: block; object-fit: cover; }
+        .img-bubble .img-label { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; text-align: right; }
+
+        /* ── Photo detection badge ── */
+        .photo-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: #10b981; border-radius: 20px; padding: 4px 12px; font-size: 0.78rem; margin-bottom: 8px; }
+
+        /* ── Input area ── */
+        .chat-input-area { padding: 16px 20px; border-top: 1px solid #eee; background: white; }
+
+        /* image preview strip */
+        .img-preview-strip { display: none; align-items: center; gap: 10px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 8px 14px; margin-bottom: 10px; }
+        .img-preview-strip img { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; }
+        .img-preview-strip .img-info { flex: 1; font-size: 0.82rem; color: #166534; }
+        .img-preview-strip .img-info span { display: block; font-weight: 600; }
+        .img-preview-strip .remove-img { background: none; border: none; color: #ef4444; font-size: 1rem; cursor: pointer; padding: 0 6px; }
+
+        /* input row */
+        .input-row { display: flex; align-items: flex-end; gap: 10px; }
+        .input-box { flex: 1; display: flex; align-items: center; background: #f4f6f8; padding: 10px 18px; border-radius: 30px; border: 1.5px solid transparent; transition: all 0.25s; }
+        .input-box:focus-within { background: #fff; border-color: #10b981; box-shadow: 0 0 0 4px rgba(16,185,129,0.1); }
+        .chat-textarea { flex: 1; border: none; background: transparent; outline: none; resize: none; max-height: 120px; font-family: 'Outfit', sans-serif; font-size: 0.95rem; color: #1a252f; line-height: 1.5; padding: 2px 0; }
+        .chat-textarea::placeholder { color: #adb5bd; }
+        .camera-btn-active { color: #10b981 !important; }
+
+        /* camera + send buttons */
+        .cam-btn {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: #f0fdf4; border: 1.5px solid #10b981;
+            display: inline-flex !important; align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0; transition: all 0.2s;
+            text-decoration: none;
+        }
+        .cam-btn:hover { background: #d1fae5; transform: scale(1.06); }
+        .cam-btn i { color: #10b981; font-size: 1.2rem; pointer-events: none; }
+        .cam-btn svg { color: #10b981; pointer-events: none; }
+        .cam-btn.active svg { color: white; }
+        .cam-btn.active { background: #10b981; }
+        .cam-btn.active i { color: white; }
+
+        .send-btn {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: #2ecc71;
+            border: none; display: inline-flex !important; align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0;
+            box-shadow: 0 4px 14px rgba(46,204,113,0.4); transition: all 0.2s;
+        }
+        .send-btn:hover { background: #27ae60; transform: scale(1.06); }
+        .send-btn i { color: white; font-size: 1.1rem; pointer-events: none; }
+
+        /* ── Loading overlay ── */
+        .loading-overlay { display: none; position: fixed; inset: 0; background: rgba(10,15,30,0.75); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; gap: 16px; backdrop-filter: blur(4px); }
+        .loading-overlay.show { display: flex; }
+        .spinner-ring { width: 60px; height: 60px; border: 4px solid rgba(255,255,255,0.15); border-top-color: #10b981; border-radius: 50%; animation: spin 0.85s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { color: white; font-size: 1rem; font-weight: 500; }
+        .loading-sub { color: #94a3b8; font-size: 0.82rem; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 992px) { .sidebar { position: relative; width: 100%; height: auto; } .main-content { margin-left: 0; } }
     </style>
 </head>
 <body>
 
-        <!-- ═══ LIVESTOCK PRO SIDEBAR ═══ -->
-        <div class="sidebar d-none d-md-block">
-            <div class="p-4 pb-3 border-bottom border-secondary">
-                <h5 class="fw-bold m-0 text-white"><i class="fas fa-cow text-success me-2"></i>LIVESTOCK PRO</h5>
-            </div>
-            <nav class="nav flex-column p-3">
-                <a href="{% url 'profile_view' %}" class="nav-link mb-1 {% if request.resolver_match.url_name == 'profile_view' %}active{% endif %}"><i class="fas fa-user-circle me-2"></i>প্রোফাইল</a>
-                <a href="{% url 'farmer_dashboard' %}" class="nav-link mb-1 {% if request.resolver_match.url_name == 'farmer_dashboard' %}active{% endif %}"><i class="fas fa-th-large me-2"></i>ড্যাশবোর্ড</a>
-                <a href="{% url 'daily_diary' %}" class="nav-link mb-1 {% if request.resolver_match.url_name == 'daily_diary' %}active{% endif %}"><i class="fas fa-chart-pie me-2"></i>এগ্রোট্র্যাক</a>
-                <div class="ai-doctor-btn mt-2">
-                    <a href="{% url 'farm_ai_doctor' %}" class="nav-link {% if request.resolver_match.url_name == 'farm_ai_doctor' %}active{% endif %}" style="color:#10b981;"><i class="fas fa-robot me-2"></i>এআই ডাক্তার</a>
-                </div>
-                <div class="mt-2" style="border:1.5px solid rgba(124,58,237,0.4);border-radius:10px;">
-                    <a href="{% url 'animal_analysis' %}" class="nav-link {% if request.resolver_match.url_name == 'animal_analysis' %}active{% endif %}" style="color:#7c3aed;"><i class="fas fa-microscope me-2"></i>পশু বিশ্লেষণ</a>
-                </div>
-                <a href="{% url 'logout' %}" class="nav-link mt-4 text-danger"><i class="fas fa-sign-out-alt me-2"></i>লগআউট</a>
-            </nav>
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner-ring"></div>
+    <div class="loading-text" id="loadingText">AI বিশ্লেষণ করছে...</div>
+    <div class="loading-sub" id="loadingSub">একটু অপেক্ষা করুন</div>
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar d-none d-md-block">
+    <div class="p-4 pb-3 border-bottom border-secondary">
+        <h5 class="fw-bold m-0 text-white"><i class="fas fa-cow text-success me-2"></i>LIVESTOCK PRO</h5>
+    </div>
+    <nav class="nav flex-column p-3">
+        <a href="{% url 'profile_view' %}" class="nav-link mb-1 {% if request.resolver_match.url_name == 'profile_view' %}active{% endif %}"><i class="fas fa-user-circle me-2"></i>প্রোফাইল</a>
+        <a href="{% url 'farmer_dashboard' %}" class="nav-link mb-1 {% if request.resolver_match.url_name == 'farmer_dashboard' %}active{% endif %}"><i class="fas fa-th-large me-2"></i>ড্যাশবোর্ড</a>
+        <a href="{% url 'daily_diary' %}" class="nav-link mb-1 {% if request.resolver_match.url_name == 'daily_diary' %}active{% endif %}"><i class="fas fa-chart-pie me-2"></i>এগ্রোট্র্যাক</a>
+        <div class="ai-doctor-btn mt-2">
+            <a href="{% url 'farm_ai_doctor' %}" class="nav-link {% if request.resolver_match.url_name == 'farm_ai_doctor' %}active{% endif %}" style="color:#10b981;"><i class="fas fa-robot me-2"></i>এআই ডাক্তার</a>
         </div>
+        <div class="mt-2" style="border:1.5px solid rgba(124,58,237,0.4);border-radius:10px;">
+            <a href="{% url 'animal_analysis' %}" class="nav-link {% if request.resolver_match.url_name == 'animal_analysis' %}active{% endif %}" style="color:#7c3aed;"><i class="fas fa-microscope me-2"></i>পশু বিশ্লেষণ</a>
+            <a href="{% url 'ai_prediction' %}" class="nav-link {% if request.resolver_match.url_name == 'ai_prediction' %}active{% endif %}" style="color:#f59e0b;"><i class="fas fa-chart-line me-2"></i>AI পূর্বাভাস</a>
+        </div>
+        <a href="{% url 'logout' %}" class="nav-link mt-4 text-danger"><i class="fas fa-sign-out-alt me-2"></i>লগআউট</a>
+    </nav>
+</div>
 
 <div class="main-content">
     <div class="chat-container">
+
+        <!-- Header -->
         <div class="chat-header">
-            <div class="d-flex align-items-center">
-                <div class="bg-light p-2 rounded-circle me-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-light p-2 rounded-circle">
                     <i class="fas fa-user-md text-success fa-lg"></i>
                 </div>
                 <div>
                     <h5 class="m-0 fw-bold">এআই ডক্টর</h5>
-                    <span class="badge bg-success-subtle text-success p-1" style="font-size: 0.7rem;">Online</span>
+                    <span class="badge bg-success-subtle text-success p-1" style="font-size:0.7rem;">Online</span>
                 </div>
             </div>
-            <form method="POST">
-                {% csrf_token %}
-                <button type="submit" name="clear_ai" class="btn btn-outline-danger btn-sm rounded-pill px-3">
-                    <i class="fas fa-trash-alt me-1"></i> ক্লিয়ার চ্যাট
-                </button>
-            </form>
+            <div class="d-flex align-items-center gap-2">
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <button type="submit" name="clear_ai" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                        <i class="fas fa-trash-alt me-1"></i> ক্লিয়ার
+                    </button>
+                </form>
+            </div>
         </div>
 
+        <!-- Chat messages -->
         <div class="chat-messages" id="chat-box">
+            <canvas id="nn-canvas"></canvas>
+
+            <!-- Welcome message -->
             <div class="message message-ai">
-                <p>স্বাগতম! আমি আপনার পশুর স্বাস্থ্যের দেখাশোনা করতে প্রস্তুত। আপনার পশুর লক্ষণগুলো বলুন অথবা আক্রান্ত স্থানের ছবি পাঠান।</p>
+                <p>স্বাগতম! আমি আপনার পশুর স্বাস্থ্যের দেখাশোনা করতে প্রস্তুত।</p>
+                <p style="margin:0;font-size:0.88rem;opacity:0.8;">📝 লক্ষণ বলুন <strong>অথবা</strong> 📷 আক্রান্ত স্থানের ছবি তুলে পাঠান — AI দেখেই রোগ বলে দেবে।</p>
             </div>
 
-            {% if user_query %}
-            <div class="message message-user">
-                {{ user_query }}
+            {% if image_sent %}
+            <!-- Show image was sent -->
+            <div class="img-bubble">
+                <div class="photo-badge"><i class="fas fa-camera"></i> ছবি পাঠানো হয়েছে</div>
             </div>
+            {% endif %}
+
+            {% if user_query %}
+            <div class="message message-user">{{ user_query }}</div>
             {% endif %}
 
             {% if response %}
             <div class="message message-ai">
+                {% if image_sent %}
+                <div class="photo-badge" style="margin-bottom:10px;"><i class="fas fa-eye"></i> ছবি দেখে AI Diagnosis</div>
+                {% endif %}
                 {{ response|linebreaks }}
             </div>
             {% endif %}
         </div>
 
+        <!-- Input area -->
         <div class="chat-input-area">
-            <div id="file-preview"><i class="fas fa-image me-1"></i> <span></span></div>
-            <form method="POST" enctype="multipart/form-data" id="chat-form">
+
+            <!-- Image preview strip -->
+            <div class="img-preview-strip" id="imgPreviewStrip">
+                <img id="previewThumb" src="" alt="preview">
+                <div class="img-info">
+                    <span id="previewName">ছবি নির্বাচিত</span>
+                    <small><i class="fas fa-robot me-1"></i>AI ছবি দেখে রোগ বিশ্লেষণ করবে</small>
+                </div>
+                <button class="remove-img" onclick="removeImage()" title="ছবি বাদ দিন">
+                    <i class="fas fa-times-circle"></i>
+                </button>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data" id="chat-form" onsubmit="showLoading(this)">
                 {% csrf_token %}
-                <div class="input-group-custom">
-                    <label for="file-upload" class="icon-btn" title="ছবি আপলোড করুন">
-                        <i class="fas fa-camera"></i>
-                        <input type="file" name="user_image" id="file-upload" class="d-none" accept="image/*" onchange="updateFileName()">
+                <input type="file" name="user_image" id="file-upload" class="d-none" accept="image/*" onchange="handleImageSelect(this)">
+                <div class="input-row">
+                    <div class="input-box">
+                        <textarea name="user_query" id="user_input" class="chat-textarea" placeholder="এখানে লিখুন..." rows="1"></textarea>
+                    </div>
+                    <label for="file-upload" id="cameraBtn" class="cam-btn" title="ছবি পাঠান">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                            <circle cx="12" cy="13" r="4"/>
+                        </svg>
                     </label>
-                    
-                    <textarea name="user_query" id="user_input" class="chat-textarea" placeholder="এখানে লিখুন..." rows="1" required></textarea>
-                    
                     <button type="submit" class="send-btn">
-                        <i class="fas fa-paper-plane"></i>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"/>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                        </svg>
                     </button>
                 </div>
             </form>
@@ -224,35 +232,123 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // অটো স্ক্রল ডাউন
+    // Auto scroll
     const chatBox = document.getElementById('chat-box');
     chatBox.scrollTop = chatBox.scrollHeight;
 
-    // টেক্সট এরিয়া অটো-রিসাইজ
+    // Textarea auto-resize
     const tx = document.getElementById('user_input');
     tx.addEventListener("input", function() {
         this.style.height = "auto";
-        this.style.height = (this.scrollHeight) + "px";
+        this.style.height = this.scrollHeight + "px";
     });
 
-    // ফাইল নেম শো করা
-    function updateFileName() {
-        const input = document.getElementById('file-upload');
-        const preview = document.getElementById('file-preview');
-        if(input.files.length > 0) {
-            preview.style.display = "block";
-            preview.querySelector('span').innerText = "ছবি যুক্ত হয়েছে: " + input.files[0].name;
-        }
-    }
-
-    // Enter প্রেস করলে মেসেজ পাঠানো (Shift+Enter এ নতুন লাইন)
+    // Enter to send
     tx.addEventListener("keydown", function(e) {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
+            document.getElementById('chat-form').dispatchEvent(new Event('submit', {bubbles: true, cancelable: true}));
             document.getElementById('chat-form').submit();
         }
     });
+
+    // Handle image select — show preview
+    function handleImageSelect(input) {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('previewThumb').src = e.target.result;
+            document.getElementById('previewName').innerText = file.name;
+            document.getElementById('imgPreviewStrip').style.display = 'flex';
+            document.getElementById('cameraBtn').classList.add('active');
+            // make textarea optional when image selected
+            tx.removeAttribute('required');
+            if (!tx.value.trim()) tx.placeholder = "ছবি দিয়েছেন — লিখতে না চাইলে সরাসরি পাঠান";
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Remove selected image
+    function removeImage() {
+        document.getElementById('file-upload').value = '';
+        document.getElementById('imgPreviewStrip').style.display = 'none';
+        document.getElementById('cameraBtn').classList.remove('active');
+        tx.setAttribute('required', '');
+        tx.placeholder = "পশুর লক্ষণ লিখুন... অথবা ছবি দিন";
+    }
+
+    // Loading overlay
+    function showLoading(form) {
+        const hasImage = document.getElementById('file-upload').files.length > 0;
+        const overlay = document.getElementById('loadingOverlay');
+        const text = document.getElementById('loadingText');
+        const sub = document.getElementById('loadingSub');
+
+        if (hasImage) {
+            text.innerText = 'ছবি বিশ্লেষণ করছে...';
+            sub.innerText = 'AI ছবি দেখে রোগ detect করছে — একটু সময় লাগবে';
+        } else {
+            text.innerText = 'AI উত্তর তৈরি করছে...';
+            sub.innerText = 'ভেটেরিনারি knowledge base চেক করা হচ্ছে';
+        }
+        overlay.classList.add('show');
+    }
+</script>
+
+<!-- Neural Network Background -->
+<script>
+(function() {
+    const canvas = document.getElementById('nn-canvas');
+    const ctx = canvas.getContext('2d');
+    const box = canvas.parentElement;
+    function resize() { canvas.width = box.offsetWidth; canvas.height = box.offsetHeight; }
+    resize();
+    window.addEventListener('resize', resize);
+    const NODES = 55;
+    const nodes = [];
+    for (let i = 0; i < NODES; i++) {
+        nodes.push({
+            x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 0.38, vy: (Math.random() - 0.5) * 0.38,
+            r: Math.random() * 2 + 1, pulse: Math.random() * Math.PI * 2,
+            color: Math.random() > 0.5 ? '16,185,129' : '99,102,241'
+        });
+    }
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        nodes.forEach(n => {
+            n.x += n.vx; n.y += n.vy; n.pulse += 0.022;
+            if (n.x < 0 || n.x > canvas.width) n.vx *= -1;
+            if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
+        });
+        for (let i = 0; i < nodes.length; i++) {
+            for (let j = i + 1; j < nodes.length; j++) {
+                const a = nodes[i], b = nodes[j];
+                const dx = a.x - b.x, dy = a.y - b.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist < 115) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = `rgba(99,102,241,${(1 - dist/115) * 0.3})`;
+                    ctx.lineWidth = 0.7;
+                    ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
+                    ctx.stroke();
+                }
+            }
+        }
+        nodes.forEach(n => {
+            const g = Math.sin(n.pulse) * 0.4 + 0.6;
+            ctx.beginPath(); ctx.arc(n.x, n.y, n.r * 3.5, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${n.color},${g * 0.1})`; ctx.fill();
+            ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${n.color},${g * 0.85})`; ctx.fill();
+        });
+        requestAnimationFrame(draw);
+    }
+    draw();
+})();
 </script>
 </body>
 </html>
