@@ -15,4 +15,5 @@ urlpatterns = [
     path('animal-analysis/', views.animal_analysis_view, name='animal_analysis'),
     path('ai-prediction/', views.ai_prediction_view, name='ai_prediction'),  # নতুন AI prediction
     path('ai-debug/', views.ai_debug_view, name='ai_debug'),
+    path('disease-news/', views.disease_news_view, name='disease_news'),
 ]

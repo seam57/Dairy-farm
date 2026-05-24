@@ -101,6 +101,80 @@ def groq_chat(prompt, image_path=None):
         )
     return response.choices[0].message.content
 
+
+# --- Disease Outbreak Alert (Groq Web Search) ---
+import threading
+_outbreak_cache = {"data": None, "timestamp": None}
+
+def get_outbreak_alert():
+    """বাংলাদেশে current disease situation — প্রতি ৬ ঘণ্টায় update"""
+    from datetime import datetime, timedelta
+    import json as _json
+
+    now = datetime.now()
+    if (_outbreak_cache["data"] is not None and
+        _outbreak_cache["timestamp"] and
+        now - _outbreak_cache["timestamp"] < timedelta(hours=6)):
+        return _outbreak_cache["data"]
+
+    try:
+        prompt = """তুমি একজন livestock disease surveillance expert।
+আজকের তারিখ: """ + now.strftime("%B %Y") + """
+
+বাংলাদেশ ও দক্ষিণ এশিয়ায় এখন কোন কোন পশু-পাখির রোগের প্রকোপ আছে সেটা web থেকে খুঁজে বের করো।
+Bird Flu, Newcastle Disease, FMD, Lumpy Skin Disease, PPR, Anthrax সহ যেকোনো রোগ।
+
+নিচের JSON format এ উত্তর দাও, শুধু JSON, আর কিছু না:
+{
+  "updated": "মাস বছর",
+  "alerts": [
+    {
+      "level": "high/medium/low",
+      "disease": "রোগের নাম বাংলায়",
+      "disease_en": "English name",
+      "affects": "গরু/মুরগি/ছাগল/সব পশু",
+      "location": "কোথায় — জেলা বা দেশ",
+      "message": "সতর্কবার্তা ২০ শব্দে বাংলায়",
+      "action": "করণীয় ১৫ শব্দে বাংলায়",
+      "source": "তথ্যসূত্র"
+    }
+  ]
+}
+
+কোনো outbreak না থাকলে: {"updated": "মাস বছর", "alerts": []}"""
+
+        response = groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=800,
+            tools=[{"type": "web_search_20250305", "name": "web_search"}]
+        )
+
+        # content blocks থেকে text বের করো
+        full_text = ""
+        if hasattr(response.choices[0].message, 'content') and response.choices[0].message.content:
+            full_text = response.choices[0].message.content
+        else:
+            # tool_use response হলে content list থেকে নাও
+            for block in (response.choices[0].message.content or []):
+                if hasattr(block, 'text'):
+                    full_text += block.text
+
+        full_text = full_text.strip()
+        if "```" in full_text:
+            full_text = full_text.split("```")[1].replace("json","").strip()
+
+        result = _json.loads(full_text)
+        _outbreak_cache["data"] = result
+        _outbreak_cache["timestamp"] = now
+        return result
+
+    except Exception as e:
+        print(f"[OUTBREAK ERROR]: {e}")
+        _outbreak_cache["data"] = {"updated": "", "alerts": []}
+        _outbreak_cache["timestamp"] = now
+        return {"updated": "", "alerts": []}
+
 # --- Farmer Dashboard ---
 @login_required
 def farmer_dashboard(request):
@@ -131,8 +205,13 @@ def farmer_dashboard(request):
     unvaccinated_count = animals.filter(last_vaccination_date__isnull=True).count()
     total_diary_records = DailyFarmDiary.objects.filter(farmer=request.user).count()
 
+
+    # Disease outbreak alert
+    outbreak_alert = get_outbreak_alert()
+
     return render(request, 'dashboards/farmer.html', {
         'animals': animals,
+        'outbreak_alert': outbreak_alert,
         'vaccination_history_list': vaccination_history_list,
         'search_query': search_query,
         'vaccinated_count': vaccinated_count,
@@ -185,7 +264,8 @@ def diet_planner_view(request):
 
 
 
-# --- Delete Animal ---
+
+# --- Delete Animal (সব data সহ মুছে ফেলা) ---
 @login_required
 def delete_animal_view(request, animal_id):
     animal = get_object_or_404(Animal, id=animal_id, owner=request.user)
@@ -727,6 +807,43 @@ def animal_analysis_view(request):
         "animal_expense":  animal_expense,
         "animal_profit":   animal_profit,
         "animal_records":  animal_records,
+    })
+
+
+# --- Disease News View ---
+@login_required
+def disease_news_view(request):
+    import json as _json
+    from datetime import datetime, timedelta
+
+    # Refresh করলে cache clear
+    if request.GET.get('refresh'):
+        _outbreak_cache["data"] = None
+        _outbreak_cache["timestamp"] = None
+
+    outbreak_data = get_outbreak_alert()
+
+    # পুরনো single-alert format হলে convert করো
+    if isinstance(outbreak_data, dict) and 'alerts' not in outbreak_data:
+        if outbreak_data.get('has_alert'):
+            outbreak_data = {
+                "updated": datetime.now().strftime("%B %Y"),
+                "alerts": [{
+                    "level": outbreak_data.get("level", "medium"),
+                    "disease": outbreak_data.get("disease", ""),
+                    "disease_en": "",
+                    "affects": "সব পশু",
+                    "location": outbreak_data.get("location", ""),
+                    "message": outbreak_data.get("message", ""),
+                    "action": outbreak_data.get("action", ""),
+                    "source": ""
+                }]
+            }
+        else:
+            outbreak_data = {"updated": "", "alerts": []}
+
+    return render(request, 'dashboards/disease_news.html', {
+        'outbreak_data': outbreak_data,
     })
 
 # --- Authentication ---

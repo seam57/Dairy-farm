@@ -1,0 +1,177 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>রোগের আপডেট | Livestock Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --accent: #10b981; --sidebar-bg: #0f172a; }
+        * { box-sizing: border-box; }
+        body { background: #f1f5f9; font-family: 'Hind Siliguri', sans-serif; color: #1e293b; margin: 0; }
+
+        /* Sidebar */
+        .sidebar { background: var(--sidebar-bg); min-height: 100vh; position: fixed; width: 240px; z-index: 1000; }
+        .nav-link { color: #94a3b8; padding: 11px 16px; border-radius: 10px; margin: 3px 12px; display: flex; align-items: center; font-weight: 500; text-decoration: none; transition: 0.2s; font-size: 0.92rem; }
+        .nav-link i { width: 22px; font-size: 1rem; }
+        .nav-link:hover { color: white; background: rgba(255,255,255,0.07); }
+        .nav-link.active { background: var(--accent); color: white; box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
+
+        .main-content { margin-left: 240px; padding: 28px 32px; min-height: 100vh; }
+
+        /* Hero */
+        .hero { background: linear-gradient(135deg, #0f172a, #1e3a5f); border-radius: 20px; padding: 28px 32px; color: white; margin-bottom: 28px; display: flex; align-items: center; gap: 24px; position: relative; overflow: hidden; }
+        .hero::before { content:''; position:absolute; top:-40px; right:-40px; width:160px; height:160px; background:rgba(16,185,129,0.1); border-radius:50%; }
+        .hero-icon { width: 64px; height: 64px; background: rgba(16,185,129,0.15); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; flex-shrink: 0; }
+        .hero h4 { font-size: 1.4rem; font-weight: 700; margin: 0 0 4px; }
+        .hero p { color: #94a3b8; margin: 0; font-size: 0.88rem; }
+        .update-badge { background: rgba(16,185,129,0.2); border: 1px solid rgba(16,185,129,0.3); color: #10b981; border-radius: 20px; padding: 4px 14px; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; }
+
+        /* News card */
+        .news-card { background: white; border-radius: 18px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid rgba(226,232,240,0.8); margin-bottom: 16px; transition: 0.2s; }
+        .news-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+
+        .card-left-bar { width: 5px; flex-shrink: 0; }
+        .bar-high   { background: #ef4444; }
+        .bar-medium { background: #f59e0b; }
+        .bar-low    { background: #10b981; }
+
+        .card-body-inner { padding: 18px 20px; flex: 1; }
+
+        .level-badge { border-radius: 20px; padding: 3px 12px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.3px; }
+        .badge-high   { background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; }
+        .badge-medium { background: #fffbeb; color: #d97706; border: 1px solid #fcd34d; }
+        .badge-low    { background: #f0fdf4; color: #16a34a; border: 1px solid #86efac; }
+
+        .disease-name { font-size: 1.05rem; font-weight: 700; color: #0f172a; margin: 6px 0 2px; }
+        .disease-en   { font-size: 0.78rem; color: #94a3b8; margin-bottom: 8px; }
+        .meta-row { display: flex; flex-wrap: wrap; gap: 12px; font-size: 0.78rem; color: #64748b; margin-bottom: 10px; }
+        .meta-row span { display: flex; align-items: center; gap: 4px; }
+        .message-text { font-size: 0.88rem; color: #334155; line-height: 1.6; margin-bottom: 10px; }
+        .action-box { border-radius: 10px; padding: 8px 14px; font-size: 0.82rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+        .action-high   { background: #fef2f2; color: #991b1b; }
+        .action-medium { background: #fffbeb; color: #92400e; }
+        .action-low    { background: #f0fdf4; color: #166534; }
+        .source-text { font-size: 0.72rem; color: #94a3b8; margin-top: 8px; }
+
+        /* No alert state */
+        .no-alert { background: white; border-radius: 18px; padding: 48px 24px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+
+        /* Loading */
+        .loading-card { background: white; border-radius: 18px; padding: 32px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 16px; }
+        .spinner-small { width: 28px; height: 28px; border: 3px solid #e2e8f0; border-top-color: #10b981; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Refresh btn */
+        .btn-refresh { background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 18px; font-family: 'Hind Siliguri', sans-serif; font-size: 0.85rem; font-weight: 600; color: #334155; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-refresh:hover { background: #e2e8f0; }
+
+        /* Ask AI btn */
+        .btn-ai { background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 12px; padding: 8px 18px; font-family: 'Hind Siliguri', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-ai:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(16,185,129,0.35); color: white; }
+    </style>
+</head>
+<body>
+<div class="d-flex">
+
+    <!-- Sidebar -->
+    <div class="sidebar d-none d-md-block">
+        <div class="p-4 pb-3 border-bottom border-secondary">
+            <h5 class="fw-bold m-0 text-white"><i class="fas fa-cow text-success me-2"></i>LIVESTOCK PRO</h5>
+        </div>
+        <nav class="nav flex-column p-3 mt-1">
+            <a href="{% url 'profile_view' %}" class="nav-link mb-1 {% if request.resolver_match.url_name == 'profile_view' %}active{% endif %}"><i class="fas fa-user-circle me-2"></i>প্রোফাইল</a>
+            <a href="{% url 'farmer_dashboard' %}" class="nav-link mb-1 {% if request.resolver_match.url_name == 'farmer_dashboard' %}active{% endif %}"><i class="fas fa-th-large me-2"></i>ড্যাশবোর্ড</a>
+            <a href="{% url 'daily_diary' %}" class="nav-link mb-1 {% if request.resolver_match.url_name == 'daily_diary' %}active{% endif %}"><i class="fas fa-chart-pie me-2"></i>এগ্রোট্র্যাক</a>
+            <div class="mt-2 mb-1" style="border:1.5px solid rgba(16,185,129,0.3);border-radius:10px;">
+                <a href="{% url 'farm_ai_doctor' %}" class="nav-link {% if request.resolver_match.url_name == 'farm_ai_doctor' %}active{% endif %}" style="color:#10b981;"><i class="fas fa-robot me-2"></i>এআই ডাক্তার</a>
+            </div>
+            <div class="mt-1 mb-1" style="border:1.5px solid rgba(124,58,237,0.3);border-radius:10px;">
+                <a href="{% url 'animal_analysis' %}" class="nav-link {% if request.resolver_match.url_name == 'animal_analysis' %}active{% endif %}" style="color:#7c3aed;"><i class="fas fa-microscope me-2"></i>পশু বিশ্লেষণ</a>
+                <a href="{% url 'ai_prediction' %}" class="nav-link {% if request.resolver_match.url_name == 'ai_prediction' %}active{% endif %}" style="color:#f59e0b;"><i class="fas fa-chart-line me-2"></i>AI পূর্বাভাস</a>
+            </div>
+            <a href="{% url 'disease_news' %}" class="nav-link mt-1 {% if request.resolver_match.url_name == 'disease_news' %}active{% endif %}" style="{% if request.resolver_match.url_name != 'disease_news' %}color:#f87171;{% endif %}">
+                <i class="fas fa-newspaper me-2"></i>রোগের আপডেট
+            </a>
+            <a href="{% url 'logout' %}" class="nav-link mt-3 text-danger"><i class="fas fa-sign-out-alt me-2"></i>লগআউট</a>
+        </nav>
+    </div>
+
+    <!-- Main -->
+    <div class="main-content w-100">
+
+        <!-- Hero -->
+        <div class="hero">
+            <div class="hero-icon">📰</div>
+            <div>
+                <h4>রোগের আপডেট</h4>
+                <p>বাংলাদেশ ও দক্ষিণ এশিয়ায় পশু-পাখির রোগের সর্বশেষ পরিস্থিতি</p>
+                {% if outbreak_data.updated %}
+                <div class="update-badge"><i class="fas fa-sync-alt fa-spin" style="font-size:0.65rem;"></i>সর্বশেষ আপডেট: {{ outbreak_data.updated }}</div>
+                {% endif %}
+            </div>
+            <div class="ms-auto d-flex gap-2 flex-shrink-0">
+                <a href="{% url 'disease_news' %}?refresh=1" class="btn-refresh"><i class="fas fa-sync-alt"></i>রিফ্রেশ</a>
+                <a href="{% url 'farm_ai_doctor' %}" class="btn-ai"><i class="fas fa-robot"></i>AI ডাক্তার</a>
+            </div>
+        </div>
+
+        <!-- Alerts -->
+        {% if outbreak_data.alerts %}
+            <div class="mb-3 d-flex align-items-center justify-content-between">
+                <div style="font-size:0.85rem;color:#64748b;">
+                    মোট <strong style="color:#0f172a;">{{ outbreak_data.alerts|length }}টি</strong> সতর্কতা পাওয়া গেছে
+                </div>
+                <div class="d-flex gap-2" style="font-size:0.75rem;">
+                    {% for alert in outbreak_data.alerts %}
+                    {% if alert.level == 'high' %}<span style="background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;border-radius:20px;padding:2px 10px;font-weight:600;">🚨 উচ্চ ঝুঁকি</span>{% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% for alert in outbreak_data.alerts %}
+            <div class="news-card d-flex">
+                <div class="card-left-bar bar-{{ alert.level }}"></div>
+                <div class="card-body-inner">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <span class="level-badge badge-{{ alert.level }}">
+                            {% if alert.level == 'high' %}🚨 উচ্চ ঝুঁকি
+                            {% elif alert.level == 'medium' %}⚠️ মাঝারি ঝুঁকি
+                            {% else %}📢 সাধারণ সতর্কতা{% endif %}
+                        </span>
+                        <span style="font-size:0.72rem;color:#94a3b8;">{{ outbreak_data.updated }}</span>
+                    </div>
+                    <div class="disease-name">{{ alert.disease }}</div>
+                    <div class="disease-en">{{ alert.disease_en }}</div>
+                    <div class="meta-row">
+                        <span><i class="fas fa-map-marker-alt"></i> {{ alert.location }}</span>
+                        <span><i class="fas fa-paw"></i> {{ alert.affects }}</span>
+                    </div>
+                    <div class="message-text">{{ alert.message }}</div>
+                    <div class="action-box action-{{ alert.level }}">
+                        <i class="fas fa-exclamation-circle"></i> {{ alert.action }}
+                    </div>
+                    {% if alert.source %}
+                    <div class="source-text"><i class="fas fa-link me-1"></i>সূত্র: {{ alert.source }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+
+        {% else %}
+            <div class="no-alert">
+                <div style="font-size:3rem;margin-bottom:12px;">✅</div>
+                <div style="font-size:1.1rem;font-weight:700;color:#166534;margin-bottom:6px;">এই মুহূর্তে কোনো বিশেষ সতর্কতা নেই</div>
+                <div style="font-size:0.88rem;color:#64748b;margin-bottom:20px;">বাংলাদেশে পশু-পাখির রোগের পরিস্থিতি স্বাভাবিক আছে।</div>
+                <a href="{% url 'disease_news' %}?refresh=1" class="btn-refresh"><i class="fas fa-sync-alt"></i>আবার চেক করুন</a>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

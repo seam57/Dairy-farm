@@ -8,257 +8,321 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
         :root {
             --sidebar-bg: #0f172a;
-            --main-bg: #f8fafc;
-            --accent-green: #10b981;
-            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            --main-bg: #f1f5f9;
+            --accent: #10b981;
+            --card-shadow: 0 2px 12px rgba(0,0,0,0.06);
         }
+        * { box-sizing: border-box; }
+        body { background: var(--main-bg); font-family: 'Hind Siliguri', sans-serif; color: #1e293b; margin: 0; }
 
-        body { 
-            background-color: var(--main-bg); 
-            font-family: 'Hind Siliguri', sans-serif;
-            color: #1e293b;
-        }
+        /* ── Sidebar ── */
+        .sidebar { background: var(--sidebar-bg); min-height: 100vh; position: fixed; width: 240px; z-index: 1000; }
+        .nav-link { color: #94a3b8; padding: 11px 16px; border-radius: 10px; margin: 3px 12px; display: flex; align-items: center; font-weight: 500; text-decoration: none; transition: 0.2s; font-size: 0.92rem; }
+        .nav-link i { width: 22px; font-size: 1rem; }
+        .nav-link:hover { color: white; background: rgba(255,255,255,0.07); }
+        .nav-link.active { background: var(--accent); color: white; box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
 
-        .sidebar { background: var(--sidebar-bg); min-height: 100vh; position: fixed; width: 260px; z-index: 1000; box-shadow: 4px 0 10px rgba(0,0,0,0.1); }
-        .nav-link { color: #94a3b8; padding: 12px 20px; transition: 0.3s; border-radius: 12px; margin: 4px 15px; display: flex; align-items: center; font-weight: 500; text-decoration: none; }
-        .nav-link i { font-size: 1.1rem; width: 25px; }
-        .nav-link:hover, .nav-link.active { color: white; background: rgba(255,255,255,0.08); }
-        .nav-link.active { background: var(--accent-green); color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
-        .main-content { margin-left: 260px; padding: 40px; }
-        
-        /* Stylish Welcome Section */
-        .welcome-title { color: #0f172a; font-size: 2.2rem; letter-spacing: -0.5px; }
-        .username-highlight { color: var(--accent-green); position: relative; display: inline-block; }
-        .username-highlight::after { content: ''; position: absolute; width: 100%; height: 8px; background: rgba(16, 185, 129, 0.15); bottom: 5px; left: 0; z-index: -1; border-radius: 4px; }
-        
-        .diary-banner { background: linear-gradient(135deg, #065f46 0%, #10b981 100%); border-radius: 24px; padding: 30px; color: white; position: relative; overflow: hidden; display: block; text-decoration: none; transition: 0.3s ease; box-shadow: 0 15px 30px rgba(16, 185, 129, 0.2); }
-        .diary-banner:hover { transform: translateY(-5px); color: white; }
-        .glass-card { background: white; border-radius: 24px; border: 1px solid rgba(226, 232, 240, 0.8); box-shadow: var(--card-shadow); padding: 25px; height: 100%; }
-        .table thead th { background-color: #f1f5f9; border: none; color: #64748b; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 15px; }
-        .tag-badge { background: #f1f5f9; color: #334155; padding: 5px 12px; border-radius: 8px; font-family: monospace; font-weight: 600; }
-        .btn-add { background: var(--sidebar-bg); color: white; border-radius: 12px; padding: 10px 24px; font-weight: 600; border: none; transition: 0.3s; }
-        .btn-add:hover { background: #1e293b; color: white; transform: scale(1.02); }
-        .action-btn { width: 35px; height: 35px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; border: 1px solid #e2e8f0; background: white; cursor: pointer; }
-        
-        @media (max-width: 1200px) { .main-content { margin-left: 0; padding: 30px 20px; } }
-        @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; padding: 20px; } }
-    
-        /* ── Sidebar nav hover animations ── */
-        .sidebar .nav-link { transition: all 0.2s ease; border-radius: 10px; }
-        .sidebar .nav-link:hover { background: rgba(255,255,255,0.08) !important; color: #fff !important; transform: translateX(4px); }
-        .sidebar .nav-link.active { background: #10b981 !important; color: #fff !important; box-shadow: 0 4px 14px rgba(16,185,129,0.3); transform: none; }
-        .ai-doctor-btn { border: 1.5px solid rgba(16,185,129,0.4); border-radius: 10px; transition: border-color 0.2s, box-shadow 0.2s; }
-        .ai-doctor-btn:hover { border-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.2); }
-        .sidebar .nav-link[style*="7c3aed"]:hover { background: rgba(124,58,237,0.12) !important; color: #7c3aed !important; }
-        .sidebar .nav-link[style*="7c3aed"].active { background: #7c3aed !important; color: #fff !important; }
+        /* ── Main ── */
+        .main-content { margin-left: 240px; padding: 28px 32px; min-height: 100vh; }
+
+        /* ── Summary Cards ── */
+        .stat-card { background: white; border-radius: 18px; padding: 22px 24px; box-shadow: var(--card-shadow); border: 1px solid rgba(226,232,240,0.8); display: flex; align-items: center; gap: 18px; }
+        .stat-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
+        .stat-label { font-size: 0.78rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .stat-value { font-size: 1.7rem; font-weight: 700; color: #0f172a; line-height: 1; }
+        .stat-sub { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; }
+
+        /* ── Outbreak Alert ── */
+        .outbreak-high   { background: #fef2f2; border: 1.5px solid #fca5a5; border-radius: 16px; padding: 16px 20px; }
+        .outbreak-medium { background: #fffbeb; border: 1.5px solid #fcd34d; border-radius: 16px; padding: 16px 20px; }
+        .outbreak-low    { background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 16px; padding: 16px 20px; }
+        .alert-icon-wrap { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.3rem; }
+
+        /* ── Diary Banner ── */
+        .diary-banner { background: linear-gradient(135deg, #10b981, #059669); border-radius: 20px; padding: 24px 30px; color: white; text-decoration: none; display: block; transition: 0.2s; }
+        .diary-banner:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(16,185,129,0.3); color: white; }
+
+        /* ── Glass Cards ── */
+        .glass-card { background: white; border-radius: 20px; padding: 24px; box-shadow: var(--card-shadow); border: 1px solid rgba(226,232,240,0.8); height: 100%; }
+
+        /* ── Tag badge ── */
+        .tag-badge { background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px; padding: 4px 10px; font-size: 0.82rem; font-weight: 600; color: #334155; }
+
+        /* ── Action buttons ── */
+        .action-btn { width: 34px; height: 34px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0; background: white; cursor: pointer; transition: 0.2s; color: #64748b; }
+        .action-btn:hover { background: #f8fafc; }
+        .action-btn.danger:hover { background: #fef2f2; border-color: #fca5a5; color: #ef4444; }
+
+        /* ── Add Animal button ── */
+        .btn-add { background: var(--accent); color: white; border: none; border-radius: 14px; padding: 12px 22px; font-family: 'Hind Siliguri', sans-serif; font-weight: 600; font-size: 0.9rem; transition: 0.2s; }
+        .btn-add:hover { background: #059669; color: white; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(16,185,129,0.35); }
+
+        /* ── Vaccine search ── */
+        .search-card { background: white; border-radius: 18px; padding: 22px 24px; box-shadow: var(--card-shadow); border: 1px solid rgba(226,232,240,0.8); }
+
+        /* ── Section title ── */
+        .section-title { font-size: 1.05rem; font-weight: 700; color: #0f172a; margin: 0; }
+
+        /* ── Quick Links ── */
+        .quick-link { background: white; border-radius: 16px; padding: 18px 20px; text-decoration: none; display: flex; align-items: center; gap: 14px; border: 1px solid rgba(226,232,240,0.8); box-shadow: var(--card-shadow); transition: 0.2s; color: #1e293b; }
+        .quick-link:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); color: #1e293b; }
+        .quick-link-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+
+        /* ── Modal ── */
+        .modal-content { border-radius: 20px; border: none; }
+        .form-control { border-radius: 10px; border: 1px solid #e2e8f0; padding: 10px 14px; font-family: 'Hind Siliguri', sans-serif; }
+        .form-control:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(16,185,129,0.1); }
+        .form-select { border-radius: 10px; border: 1px solid #e2e8f0; }
+
+        /* ── Vaccine history ── */
+        .vax-badge { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; border-radius: 8px; padding: 3px 10px; font-size: 0.8rem; font-weight: 600; }
     </style>
 </head>
 <body>
+<div class="d-flex">
 
-<div class="container-fluid p-0">
-    <div class="d-flex">
-                <!-- ═══ LIVESTOCK PRO SIDEBAR ═══ -->
-        <div class="sidebar d-none d-md-block">
-            <div class="p-4 pb-3 border-bottom border-secondary">
-                <h5 class="fw-bold m-0 text-white"><i class="fas fa-cow text-success me-2"></i>LIVESTOCK PRO</h5>
+    <!-- ── Sidebar ── -->
+    <div class="sidebar d-none d-md-block">
+        <div class="p-4 pb-3 border-bottom border-secondary">
+            <h5 class="fw-bold m-0 text-white"><i class="fas fa-cow text-success me-2"></i>LIVESTOCK PRO</h5>
+        </div>
+        <nav class="nav flex-column p-3 mt-1">
+            <a href="{% url 'profile_view' %}" class="nav-link mb-1 {% if request.resolver_match.url_name == 'profile_view' %}active{% endif %}"><i class="fas fa-user-circle me-2"></i>প্রোফাইল</a>
+            <a href="{% url 'farmer_dashboard' %}" class="nav-link mb-1 {% if request.resolver_match.url_name == 'farmer_dashboard' %}active{% endif %}"><i class="fas fa-th-large me-2"></i>ড্যাশবোর্ড</a>
+            <a href="{% url 'daily_diary' %}" class="nav-link mb-1 {% if request.resolver_match.url_name == 'daily_diary' %}active{% endif %}"><i class="fas fa-chart-pie me-2"></i>এগ্রোট্র্যাক</a>
+            <div class="mt-2 mb-1" style="border:1.5px solid rgba(16,185,129,0.3);border-radius:10px;">
+                <a href="{% url 'farm_ai_doctor' %}" class="nav-link {% if request.resolver_match.url_name == 'farm_ai_doctor' %}active{% endif %}" style="color:#10b981;"><i class="fas fa-robot me-2"></i>এআই ডাক্তার</a>
             </div>
-            <nav class="nav flex-column p-3">
-                <a href="{% url 'profile_view' %}" class="nav-link mb-1 {% if request.resolver_match.url_name == 'profile_view' %}active{% endif %}"><i class="fas fa-user-circle me-2"></i>প্রোফাইল</a>
-                <a href="{% url 'farmer_dashboard' %}" class="nav-link mb-1 {% if request.resolver_match.url_name == 'farmer_dashboard' %}active{% endif %}"><i class="fas fa-th-large me-2"></i>ড্যাশবোর্ড</a>
-                <a href="{% url 'daily_diary' %}" class="nav-link mb-1 {% if request.resolver_match.url_name == 'daily_diary' %}active{% endif %}"><i class="fas fa-chart-pie me-2"></i>এগ্রোট্র্যাক</a>
-                <div class="ai-doctor-btn mt-2">
-                    <a href="{% url 'farm_ai_doctor' %}" class="nav-link {% if request.resolver_match.url_name == 'farm_ai_doctor' %}active{% endif %}" style="color:#10b981;"><i class="fas fa-robot me-2"></i>এআই ডাক্তার</a>
-                </div>
-                <div class="mt-2" style="border:1.5px solid rgba(124,58,237,0.4);border-radius:10px;">
-                    <a href="{% url 'animal_analysis' %}" class="nav-link {% if request.resolver_match.url_name == 'animal_analysis' %}active{% endif %}" style="color:#7c3aed;"><i class="fas fa-microscope me-2"></i>পশু বিশ্লেষণ</a>
-                    <a href="{% url 'ai_prediction' %}" class="nav-link {% if request.resolver_match.url_name == 'ai_prediction' %}active{% endif %}" style="color:#f59e0b;"><i class="fas fa-chart-line me-2"></i>AI পূর্বাভাস</a>
-                </div>
-                <a href="{% url 'logout' %}" class="nav-link mt-4 text-danger"><i class="fas fa-sign-out-alt me-2"></i>লগআউট</a>
-            </nav>
+            <div class="mt-1 mb-1" style="border:1.5px solid rgba(124,58,237,0.3);border-radius:10px;">
+                <a href="{% url 'animal_analysis' %}" class="nav-link {% if request.resolver_match.url_name == 'animal_analysis' %}active{% endif %}" style="color:#7c3aed;"><i class="fas fa-microscope me-2"></i>পশু বিশ্লেষণ</a>
+                <a href="{% url 'ai_prediction' %}" class="nav-link {% if request.resolver_match.url_name == 'ai_prediction' %}active{% endif %}" style="color:#f59e0b;"><i class="fas fa-chart-line me-2"></i>AI পূর্বাভাস</a>
+            </div>
+            <a href="{% url 'disease_news' %}" class="nav-link mt-1 {% if request.resolver_match.url_name == 'disease_news' %}active{% endif %}" style="color:#f87171;"><i class="fas fa-newspaper me-2"></i>রোগের আপডেট</a>
+            <a href="{% url 'logout' %}" class="nav-link mt-3 text-danger"><i class="fas fa-sign-out-alt me-2"></i>লগআউট</a>
+        </nav>
+    </div>
+
+    <!-- ── Main Content ── -->
+    <div class="main-content w-100">
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="fw-bold mb-1">স্বাগতম, <span style="color:var(--accent);">{{ request.user.first_name|default:request.user.username }}</span>! 👋</h4>
+                <p class="text-secondary mb-0" style="font-size:0.88rem;">আপনার খামারের সারসংক্ষেপ একনজরে দেখুন</p>
+            </div>
+            <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addModal">
+                <i class="fas fa-plus me-2"></i>নতুন প্রাণী যোগ করুন
+            </button>
         </div>
 
-<div class="main-content w-100">
-            
-            <div class="d-flex justify-content-between align-items-center mb-5">
-                <div>
-                    <h2 class="welcome-title fw-bold mb-1">
-                        স্বাগতম, <span class="username-highlight">{{ request.user.username }}</span>! 
-                    </h2>
-                    <p class="text-secondary mb-0 fw-medium" style="font-size: 1.05rem; opacity: 0.8;">
-                        আপনার খামারের বর্তমান অবস্থা এবং রেকর্ড পরিচালনা করুন।
-                    </p>
-                </div>
-                <button class="btn btn-add shadow-sm" data-bs-toggle="modal" data-bs-target="#addModal">
-                    <i class="fas fa-plus me-2"></i>নতুন প্রাণী যোগ করুন
-                </button>
-            </div>
-
-            <div class="row mb-5">
-                <div class="col-12">
-                    <a href="{% url 'daily_diary' %}" class="diary-banner">
-                        <div class="row align-items-center">
-                            <div class="col-md-8">
-                                <h3 class="fw-bold mb-2">খামার ডায়েরি (AgroTrack)</h3>
-                                <p class="mb-0 opacity-75">আজকের আয়-ব্যয়ের হিসাব এবং লাভ-ক্ষতির রিপোর্ট দেখতে এখানে ক্লিক করুন।</p>
-                            </div>
-                            <div class="col-md-4 text-end d-none d-md-block">
-                                <i class="fas fa-arrow-right-long fa-3x opacity-25"></i>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-
-            <div class="row g-4 mb-5">
-                <div class="col-lg-6">
-                    <div class="glass-card">
-                        <div class="d-flex align-items-center mb-4">
-                            <div class="p-2 rounded-3 bg-primary bg-opacity-10 me-3"><i class="fas fa-cow text-primary"></i></div>
-                            <h5 class="fw-bold m-0">গবাদি পশু (Livestock)</h5>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-borderless align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>ট্যাগ আইডি</th>
-                                        <th>জাত</th>
-                                        <th>ভ্যাকসিন</th>
-                                        <th class="text-end">অ্যাকশন</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for animal in animals %}
-                                        {% if animal.category == 'cow' or animal.category == 'goat' %}
-                                        <tr>
-                                            <td><span class="tag-badge">{{ animal.tag_id }}</span></td>
-                                            <td class="small fw-semibold">{{ animal.breed }}</td>
-                                            <td><span class="text-danger small fw-bold">{{ animal.last_vaccination_date|default:"-" }}</span></td>
-                                            <td class="text-end">
-                                                <button class="action-btn" data-bs-toggle="modal" data-bs-target="#vaxModal{{animal.id}}"><i class="fas fa-syringe"></i></button>
-                                            </td>
-                                        </tr>
-                                        {% endif %}
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-6">
-                    <div class="glass-card">
-                        <div class="d-flex align-items-center mb-4">
-                            <div class="p-2 rounded-3 bg-warning bg-opacity-10 me-3"><i class="fas fa-feather text-warning"></i></div>
-                            <h5 class="fw-bold m-0">হাঁস-মুরগি (Poultry)</h5>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-borderless align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>আইডি</th>
-                                        <th>ধরণ</th>
-                                        <th>ভ্যাকসিন</th>
-                                        <th class="text-end">অ্যাকশন</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for animal in animals %}
-                                        {% if animal.category == 'hen' or animal.category == 'duck' %}
-                                        <tr>
-                                            <td><span class="tag-badge text-warning">{{ animal.tag_id }}</span></td>
-                                            <td class="small fw-semibold text-capitalize">{% if animal.category == 'hen' %} মুরগি {% else %} হাঁস {% endif %}</td>
-                                            <td><span class="text-danger small fw-bold">{{ animal.last_vaccination_date|default:"-" }}</span></td>
-                                            <td class="text-end">
-                                                <button class="action-btn" data-bs-toggle="modal" data-bs-target="#vaxModal{{animal.id}}"><i class="fas fa-syringe text-warning"></i></button>
-                                            </td>
-                                        </tr>
-                                        {% endif %}
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
+        <!-- ── Summary Cards ── -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:#eff6ff;">🐄</div>
+                    <div>
+                        <div class="stat-label">মোট পশু</div>
+                        <div class="stat-value">{{ animals|length }}</div>
+                        <div class="stat-sub">সক্রিয় খামারে</div>
                     </div>
                 </div>
             </div>
-
-            <div class="glass-card">
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <h5 class="fw-bold m-0">ভ্যাকসিনেশন হিস্ট্রি</h5>
-                    <form method="GET" action="{% url 'farmer_dashboard' %}" class="d-flex gap-2">
-                        <input type="text" name="search_id" value="{{ search_query }}" class="form-control form-control-sm border-0 bg-light px-3" placeholder="আইডি দিয়ে সার্চ দিন (যেমন: k66)..." style="min-width: 200px;">
-                        <button type="submit" class="btn btn-sm btn-dark px-4 rounded-3">সার্চ</button>
-                    </form>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:#f0fdf4;">💉</div>
+                    <div>
+                        <div class="stat-label">ভ্যাকসিনেটেড</div>
+                        <div class="stat-value" style="color:#059669;">{{ vaccinated_count }}</div>
+                        <div class="stat-sub">ভ্যাকসিন দেওয়া হয়েছে</div>
+                    </div>
                 </div>
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead class="bg-light">
-                            <tr>
-                                <th>আইডি</th>
-                                <th>ধরণ</th>
-                                <th>তারিখ</th>
-                                <th>স্ট্যাটাস</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in vaccination_history_list %}
-                            <tr>
-                                <td class="fw-bold">{{ item.animal.tag_id }}</td>
-                                <td class="text-capitalize">
-                                    {% if item.animal.category == 'cow' %} গরু 
-                                    {% elif item.animal.category == 'goat' %} ছাগল 
-                                    {% elif item.animal.category == 'hen' %} মুরগি 
-                                    {% elif item.animal.category == 'duck' %} হাঁস 
-                                    {% else %} {{ item.animal.category }} {% endif %}
-                                </td>
-                                <td>{{ item.date }}</td>
-                                <td><span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3">সম্পন্ন</span></td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="4" class="text-center py-5 text-muted">
-                                    {% if search_query %}
-                                        রেকর্ড পাওয়া যায়নি।
-                                    {% else %}
-                                        তথ্য দেখতে পশুর আইডি লিখে সার্চ দিন।
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:#fef2f2;">⚠️</div>
+                    <div>
+                        <div class="stat-label">ভ্যাকসিন বাকি</div>
+                        <div class="stat-value" style="color:#ef4444;">{{ unvaccinated_count }}</div>
+                        <div class="stat-sub">এখনো দেওয়া হয়নি</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:#fefce8;">📒</div>
+                    <div>
+                        <div class="stat-label">ডায়েরি রেকর্ড</div>
+                        <div class="stat-value" style="color:#d97706;">{{ total_diary_records }}</div>
+                        <div class="stat-sub">মোট এন্ট্রি</div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-{% for animal in animals %}
-<div class="modal fade" id="vaxModal{{animal.id}}" tabindex="-1">
-    <div class="modal-dialog modal-sm modal-dialog-centered">
-        <form action="{% url 'update_vaccine' animal.id %}" method="POST" class="modal-content border-0 rounded-4 shadow-lg">
-            {% csrf_token %}
-            <div class="modal-body p-4 text-center">
-                <i class="fas fa-syringe fa-3x text-primary mb-3"></i>
-                <h5 class="fw-bold">ভ্যাকসিন আপডেট</h5>
-                <p class="small text-muted mb-4">আইডি: {{ animal.tag_id }}</p>
-                <input type="date" name="vaccine_date" class="form-control border-0 bg-light mb-3 p-3 rounded-3" required>
-                <button type="submit" class="btn btn-add w-100">সংরক্ষণ করুন</button>
+        <!-- ── Quick Links ── -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+                <a href="{% url 'daily_diary' %}" class="quick-link">
+                    <div class="quick-link-icon" style="background:#f0fdf4;"><i class="fas fa-chart-pie" style="color:#10b981;"></i></div>
+                    <div><div style="font-weight:700;font-size:0.88rem;">AgroTrack</div><div style="font-size:0.75rem;color:#64748b;">আয়-ব্যয় হিসাব</div></div>
+                </a>
             </div>
-        </form>
-    </div>
-</div>
-{% endfor %}
+            <div class="col-6 col-lg-3">
+                <a href="{% url 'farm_ai_doctor' %}" class="quick-link">
+                    <div class="quick-link-icon" style="background:#f0fdf4;"><i class="fas fa-robot" style="color:#10b981;"></i></div>
+                    <div><div style="font-weight:700;font-size:0.88rem;">AI ডাক্তার</div><div style="font-size:0.75rem;color:#64748b;">রোগ নির্ণয়</div></div>
+                </a>
+            </div>
+            <div class="col-6 col-lg-3">
+                <a href="{% url 'animal_analysis' %}" class="quick-link">
+                    <div class="quick-link-icon" style="background:#faf5ff;"><i class="fas fa-microscope" style="color:#7c3aed;"></i></div>
+                    <div><div style="font-weight:700;font-size:0.88rem;">পশু বিশ্লেষণ</div><div style="font-size:0.75rem;color:#64748b;">AI analysis</div></div>
+                </a>
+            </div>
+            <div class="col-6 col-lg-3">
+                <a href="{% url 'ai_prediction' %}" class="quick-link">
+                    <div class="quick-link-icon" style="background:#fffbeb;"><i class="fas fa-chart-line" style="color:#f59e0b;"></i></div>
+                    <div><div style="font-weight:700;font-size:0.88rem;">AI পূর্বাভাস</div><div style="font-size:0.75rem;color:#64748b;">লাভ-ক্ষতি পূর্বাভাস</div></div>
+                </a>
+            </div>
+        </div>
 
+        <!-- ── Animal Tables ── -->
+        <div class="row g-4 mb-4">
+            <!-- Livestock -->
+            <div class="col-lg-6">
+                <div class="glass-card">
+                    <div class="d-flex align-items-center mb-3">
+                        <div style="width:36px;height:36px;background:#eff6ff;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-right:12px;">🐄</div>
+                        <h6 class="section-title">গবাদি পশু (Livestock)</h6>
+                    </div>
+                    {% with livestock=animals|length %}
+                    {% if animals %}
+                    <div class="table-responsive">
+                        <table class="table table-borderless align-middle" style="font-size:0.87rem;">
+                            <thead>
+                                <tr style="color:#64748b;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.3px;">
+                                    <th>ট্যাগ আইডি</th>
+                                    <th>জাত</th>
+                                    <th>ভ্যাকসিন</th>
+                                    <th class="text-end">অ্যাকশন</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for animal in animals %}
+                                {% if animal.category == 'cow' or animal.category == 'goat' %}
+                                <tr>
+                                    <td><span class="tag-badge">{{ animal.tag_id }}</span></td>
+                                    <td class="fw-semibold" style="color:#334155;">{{ animal.breed|default:"—" }}</td>
+                                    <td><span style="color:#ef4444;font-weight:600;font-size:0.82rem;">{{ animal.last_vaccination_date|default:"—" }}</span></td>
+                                    <td class="text-end">
+                                        <button class="action-btn" data-bs-toggle="modal" data-bs-target="#vaxModal{{ animal.id }}" title="ভ্যাকসিন আপডেট"><i class="fas fa-syringe" style="font-size:0.8rem;"></i></button>
+                                        <button class="action-btn danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ animal.id }}" title="মুছে ফেলুন"><i class="fas fa-trash-alt" style="font-size:0.8rem;"></i></button>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div style="text-align:center;padding:30px 0;color:#94a3b8;">
+                        <i class="fas fa-cow fa-2x mb-2"></i><br>
+                        <span style="font-size:0.85rem;">কোনো গবাদি পশু নেই</span>
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+
+            <!-- Poultry -->
+            <div class="col-lg-6">
+                <div class="glass-card">
+                    <div class="d-flex align-items-center mb-3">
+                        <div style="width:36px;height:36px;background:#fffbeb;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-right:12px;">🐔</div>
+                        <h6 class="section-title">হাঁস-মুরগি (Poultry)</h6>
+                    </div>
+                    {% if animals %}
+                    <div class="table-responsive">
+                        <table class="table table-borderless align-middle" style="font-size:0.87rem;">
+                            <thead>
+                                <tr style="color:#64748b;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.3px;">
+                                    <th>আইডি</th>
+                                    <th>ধরণ</th>
+                                    <th>ভ্যাকসিন</th>
+                                    <th class="text-end">অ্যাকশন</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for animal in animals %}
+                                {% if animal.category == 'hen' or animal.category == 'duck' %}
+                                <tr>
+                                    <td><span class="tag-badge" style="background:#fffbeb;border-color:#fde68a;color:#92400e;">{{ animal.tag_id }}</span></td>
+                                    <td class="fw-semibold" style="color:#334155;">{% if animal.category == 'hen' %}মুরগি{% else %}হাঁস{% endif %}</td>
+                                    <td><span style="color:#ef4444;font-weight:600;font-size:0.82rem;">{{ animal.last_vaccination_date|default:"—" }}</span></td>
+                                    <td class="text-end">
+                                        <button class="action-btn" data-bs-toggle="modal" data-bs-target="#vaxModal{{ animal.id }}" title="ভ্যাকসিন আপডেট"><i class="fas fa-syringe" style="font-size:0.8rem;color:#f59e0b;"></i></button>
+                                        <button class="action-btn danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ animal.id }}" title="মুছে ফেলুন"><i class="fas fa-trash-alt" style="font-size:0.8rem;"></i></button>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div style="text-align:center;padding:30px 0;color:#94a3b8;">
+                        <i class="fas fa-feather fa-2x mb-2"></i><br>
+                        <span style="font-size:0.85rem;">কোনো হাঁস-মুরগি নেই</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Vaccine Search ── -->
+        <div class="search-card mb-4">
+            <div class="d-flex align-items-center mb-3">
+                <div style="width:36px;height:36px;background:#f0fdf4;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-right:12px;"><i class="fas fa-search" style="color:#10b981;font-size:0.9rem;"></i></div>
+                <h6 class="section-title">ভ্যাকসিনেশন ইতিহাস খুঁজুন</h6>
+            </div>
+            <form method="GET" action="{% url 'farmer_dashboard' %}" class="d-flex gap-2">
+                <input type="text" name="search_id" value="{{ search_query }}" class="form-control" placeholder="ট্যাগ আইডি লিখুন..." style="max-width:280px;">
+                <button type="submit" class="btn-add" style="padding:10px 20px;"><i class="fas fa-search me-1"></i>খুঁজুন</button>
+                {% if search_query %}<a href="{% url 'farmer_dashboard' %}" class="btn btn-light rounded-3" style="padding:10px 16px;font-size:0.87rem;">বাতিল</a>{% endif %}
+            </form>
+            {% if search_query %}
+            <div class="mt-3">
+                {% if vaccination_history_list %}
+                <div style="font-size:0.85rem;color:#64748b;margin-bottom:8px;">ট্যাগ <strong>{{ search_query }}</strong> — {{ vaccination_history_list|length }}টি রেকর্ড</div>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for record in vaccination_history_list %}
+                    <span class="vax-badge"><i class="fas fa-syringe me-1"></i>{{ record.date }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div style="color:#94a3b8;font-size:0.85rem;"><i class="fas fa-info-circle me-1"></i>"{{ search_query }}" এই ট্যাগের কোনো ভ্যাকসিন রেকর্ড নেই।</div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+    </div><!-- end main-content -->
+</div><!-- end d-flex -->
+
+<!-- ══════════════ MODALS ══════════════ -->
+
+<!-- Add Animal Modal -->
 <div class="modal fade" id="addModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <form method="POST" class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+        <form action="{% url 'farmer_dashboard' %}" method="POST" class="modal-content border-0 rounded-4 shadow-lg">
             {% csrf_token %}
             <input type="hidden" name="add_animal" value="1">
-            <div class="modal-header border-0 bg-light p-4">
+            <div class="modal-header border-0 pb-0 px-4 pt-4">
                 <h5 class="modal-title fw-bold">নতুন প্রাণী যোগ করুন</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -269,34 +333,87 @@
                 </div>
                 {% endif %}
                 <div class="row g-3">
-                    <div class="col-md-6"><label class="form-label small fw-bold">ট্যাগ আইডি</label><input type="text" name="tag_id" class="form-control bg-light border-0" required></div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">ট্যাগ আইডি</label>
+                        <input type="text" name="tag_id" class="form-control" placeholder="যেমন: c101" required>
+                    </div>
                     <div class="col-md-6">
                         <label class="form-label small fw-bold">ধরণ</label>
-                        <select name="category" class="form-select bg-light border-0">
+                        <select name="category" class="form-select" required>
                             <option value="cow">গরু</option>
                             <option value="goat">ছাগল</option>
                             <option value="hen">মুরগি</option>
                             <option value="duck">হাঁস</option>
                         </select>
                     </div>
-                    <div class="col-12"><label class="form-label small fw-bold">জাত</label><input type="text" name="breed" class="form-control bg-light border-0" required></div>
+                    <div class="col-12">
+                        <label class="form-label small fw-bold">জাত</label>
+                        <input type="text" name="breed" class="form-control" placeholder="যেমন: দেশি, শাহীওয়াল...">
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer border-0 p-4"><button type="submit" class="btn btn-add w-100">যোগ করুন</button></div>
+            <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                <button type="button" class="btn btn-light rounded-3 flex-fill" data-bs-dismiss="modal">বাতিল</button>
+                <button type="submit" class="btn-add rounded-3 flex-fill">যোগ করুন</button>
+            </div>
         </form>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Vaccine + Delete modals for each animal -->
+{% for animal in animals %}
+<!-- Vaccine Modal -->
+<div class="modal fade" id="vaxModal{{ animal.id }}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <form action="{% url 'update_vaccine' animal.id %}" method="POST" class="modal-content border-0 rounded-4 shadow-lg">
+            {% csrf_token %}
+            <div class="modal-body p-4">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <div style="width:40px;height:40px;background:#f0fdf4;border-radius:10px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-syringe text-success"></i></div>
+                    <div>
+                        <div class="fw-bold" style="font-size:0.9rem;">{{ animal.tag_id }} — ভ্যাকসিন আপডেট</div>
+                        <div style="font-size:0.75rem;color:#64748b;">{% if animal.last_vaccination_date %}শেষ: {{ animal.last_vaccination_date }}{% else %}এখনো দেওয়া হয়নি{% endif %}</div>
+                    </div>
+                </div>
+                <label class="form-label small fw-bold">নতুন ভ্যাকসিনের তারিখ</label>
+                <input type="date" name="vaccine_date" class="form-control" required>
+                <div class="d-flex gap-2 mt-3">
+                    <button type="button" class="btn btn-light rounded-3 flex-fill" data-bs-dismiss="modal">বাতিল</button>
+                    <button type="submit" class="btn-add rounded-3 flex-fill">সংরক্ষণ করুন</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal{{ animal.id }}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+            <div class="modal-body p-4 text-center">
+                <div style="width:56px;height:56px;background:#fef2f2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:1.4rem;">🗑️</div>
+                <h6 class="fw-bold mb-1">{{ animal.tag_id }} মুছে ফেলবেন?</h6>
+                <p class="text-muted small mb-4">এই পশুর সব তথ্য — ভ্যাকসিন ও ডায়েরি রেকর্ড সহ — সম্পূর্ণ মুছে যাবে।</p>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-light rounded-3 flex-fill" data-bs-dismiss="modal">বাতিল</button>
+                    <form action="{% url 'delete_animal' animal.id %}" method="POST" class="flex-fill">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger rounded-3 w-100">হ্যাঁ, মুছুন</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 {% if error_message %}
 document.addEventListener('DOMContentLoaded', function() {
-    var modal = new bootstrap.Modal(document.getElementById('addModal'));
-    modal.show();
+    new bootstrap.Modal(document.getElementById('addModal')).show();
 });
 {% endif %}
 </script>
-
 </body>
 </html>
