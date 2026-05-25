@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.contrib.auth.models import User
 
 class UserProfile(models.Model):
@@ -13,33 +14,60 @@ class UserProfile(models.Model):
 
 class Animal(models.Model):
     CATEGORY_CHOICES = [
-        ('cow', 'Cow'), 
-        ('goat', 'Goat'), 
+        ('cow', 'Cow'),
+        ('goat', 'Goat'),
         ('hen', 'Hen'),
         ('duck', 'Duck')
     ]
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     tag_id = models.CharField(max_length=50, unique=True)
     category = models.CharField(max_length=10, choices=CATEGORY_CHOICES)
-    breed = models.CharField(max_length=100, null=True, blank=True) 
+    breed = models.CharField(max_length=100, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     last_vaccination_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.tag_id} - {self.category}"
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        AnimalGroup.objects.get_or_create(owner=self.owner, category=self.category)
+
+class AnimalGroup(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='animal_groups')
+    category = models.CharField(max_length=10, choices=Animal.CATEGORY_CHOICES)
+
+    class Meta:
+        unique_together = ('owner', 'category')
+
+    def __str__(self):
+        return f"{self.owner.username} - {self.get_category_display()} group"
+
+    @property
+    def animal_count(self):
+        return Animal.objects.filter(owner=self.owner, category=self.category, is_active=True).count()
+
 class DailyFarmDiary(models.Model):
     farmer = models.ForeignKey(User, on_delete=models.CASCADE)
+    group = models.ForeignKey(AnimalGroup, on_delete=models.SET_NULL, null=True, blank=True, related_name='diary_entries')
     animal = models.ForeignKey(Animal, on_delete=models.SET_NULL, null=True, blank=True)
     date = models.DateField(auto_now_add=True)
-    
+
     milk_income = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     meat_income = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     egg_income = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    
+
     feed_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     medicine_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     other_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=~(Q(group__isnull=False) & Q(animal__isnull=False)),
+                name='diary_group_xor_animal',
+            ),
+        ]
 
     @property
     def total_income(self):
