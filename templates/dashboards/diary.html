@@ -61,13 +61,24 @@
                 <form method="POST">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label class="form-label small fw-bold">পশু নির্বাচন (ঐচ্ছিক)</label>
+                        <label class="form-label small fw-bold">গ্রুপ নির্বাচন</label>
+                        <select name="group_id" class="form-select bg-light border-0">
+                            <option value="">— গ্রুপ বাছাই করুন —</option>
+                            {% for g in groups %}
+                            <option value="{{ g.id }}">{{ g.get_category_display }} ({{ g.animal_count }} টি)</option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted d-block mt-1">দৈনিক আয়-ব্যয় সাধারণত গ্রুপের জন্য রেকর্ড করুন।</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">নির্দিষ্ট পশুর জন্য (ঐচ্ছিক)</label>
                         <select name="animal_id" class="form-select bg-light border-0">
-                            <option value="">জেনারেল এন্ট্রি</option>
+                            <option value="">— একক পশু এন্ট্রি নয় —</option>
                             {% for animal in animals %}
                             <option value="{{ animal.id }}">{{ animal.tag_id }} ({{ animal.get_category_display }})</option>
                             {% endfor %}
                         </select>
+                        <small class="text-muted d-block mt-1">এক পশু বিক্রি, এক পশুর জন্য বিশেষ ওষুধ ইত্যাদি one-off খরচ।</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-success">আয়ের খাত (৳)</label>
@@ -103,15 +114,15 @@
             </div>
 
             <div class="custom-card p-4">
-                <h5 class="fw-bold mb-3 text-primary">পশু ভিত্তিক লাভ-ক্ষতি</h5>
+                <h5 class="fw-bold mb-3 text-primary">গ্রুপ ভিত্তিক লাভ-ক্ষতি</h5>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
-                        <thead class="table-light"><tr><th>আইডি</th><th>ধরণ</th><th>আয়</th><th>ব্যয়</th><th>নিট লাভ</th><th>অবস্থা</th></tr></thead>
+                        <thead class="table-light"><tr><th>গ্রুপ</th><th>পশু সংখ্যা</th><th>আয়</th><th>ব্যয়</th><th>নিট লাভ</th><th>অবস্থা</th></tr></thead>
                         <tbody>
-                            {% for stat in animal_stats %}
+                            {% for stat in group_stats %}
                             <tr>
-                                <td class="fw-bold text-dark">#{{ stat.tag_id }}</td>
-                                <td class="text-secondary">{{ stat.category }}</td>
+                                <td class="fw-bold text-dark">{{ stat.category }}</td>
+                                <td class="text-secondary">{{ stat.animal_count }} টি</td>
                                 <td class="text-success fw-semibold">৳{{ stat.income|floatformat:1 }}</td>
                                 <td class="text-danger fw-semibold">৳{{ stat.expense|floatformat:1 }}</td>
                                 <td class="fw-bold">৳{{ stat.profit|floatformat:1 }}</td>
@@ -124,23 +135,45 @@
                                 </td>
                             </tr>
                             {% empty %}
-                            <tr><td colspan="6" class="text-center py-4 text-muted">তথ্য নেই</td></tr>
+                            <tr><td colspan="6" class="text-center py-4 text-muted">কোনো গ্রুপ নেই</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
 
+            {% if oneoff_stats %}
+            <div class="custom-card p-4">
+                <h5 class="fw-bold mb-3 text-warning"><i class="fas fa-tag me-2"></i>একক পশুর এন্ট্রি (one-off)</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light"><tr><th>আইডি</th><th>ধরণ</th><th>আয়</th><th>ব্যয়</th><th>নিট লাভ</th></tr></thead>
+                        <tbody>
+                            {% for stat in oneoff_stats %}
+                            <tr>
+                                <td class="fw-bold text-dark">#{{ stat.tag_id }}</td>
+                                <td class="text-secondary">{{ stat.category }}</td>
+                                <td class="text-success fw-semibold">৳{{ stat.income|floatformat:1 }}</td>
+                                <td class="text-danger fw-semibold">৳{{ stat.expense|floatformat:1 }}</td>
+                                <td class="fw-bold">৳{{ stat.profit|floatformat:1 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
             <div class="custom-card p-4">
                 <h5 class="fw-bold mb-3 text-secondary">সাম্প্রতিক লেনদেন</h5>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
-                        <thead class="table-light"><tr><th>তারিখ</th><th>পশু আইডি</th><th>আয়</th><th>ব্যয়</th><th>নিট লাভ</th></tr></thead>
+                        <thead class="table-light"><tr><th>তারিখ</th><th>উৎস</th><th>আয়</th><th>ব্যয়</th><th>নিট লাভ</th></tr></thead>
                         <tbody>
                             {% for record in history %}
                             <tr>
                                 <td class="text-dark">{{ record.date|date:"d M" }}</td>
-                                <td>{% if record.animal %}<span class="animal-tag">#{{ record.animal.tag_id }}</span>{% else %}<span class="text-muted small">জেনারেল</span>{% endif %}</td>
+                                <td>{% if record.animal %}<span class="animal-tag">#{{ record.animal.tag_id }}</span>{% elif record.group %}<span class="animal-tag">{{ record.group.get_category_display }} গ্রুপ</span>{% else %}<span class="text-muted small">জেনারেল</span>{% endif %}</td>
                                 <td class="text-success fw-semibold">৳{{ record.total_income|floatformat:1 }}</td>
                                 <td class="text-danger fw-semibold">৳{{ record.total_expense|floatformat:1 }}</td>
                                 <td class="fw-bold text-dark">

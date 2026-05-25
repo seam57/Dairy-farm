@@ -12,7 +12,7 @@ from django.db.models import Sum
 from decimal import Decimal
 
 # আপনার মডেলগুলো ইমপোর্ট করা হচ্ছে
-from .models import UserProfile, Animal, DailyFarmDiary, HealthConsultation, VaccinationRecord
+from .models import UserProfile, Animal, AnimalGroup, DailyFarmDiary, HealthConsultation, VaccinationRecord
 
 # --- RAG System ---
 import json as _json
@@ -283,10 +283,16 @@ def daily_diary_view(request):
             DailyFarmDiary.objects.filter(farmer=request.user).delete()
             return redirect('daily_diary')
         else:
-            animal_id = request.POST.get('animal_id')
-            animal_obj = Animal.objects.filter(id=animal_id).first() if animal_id else None
+            animal_id = request.POST.get('animal_id') or ''
+            group_id = request.POST.get('group_id') or ''
+            animal_obj = None
+            group_obj = None
+            if animal_id:
+                animal_obj = Animal.objects.filter(id=animal_id, owner=request.user).first()
+            elif group_id:
+                group_obj = AnimalGroup.objects.filter(id=group_id, owner=request.user).first()
             DailyFarmDiary.objects.create(
-                farmer=request.user, animal=animal_obj,
+                farmer=request.user, animal=animal_obj, group=group_obj,
                 milk_income=request.POST.get('milk_income') or 0,
                 meat_income=request.POST.get('meat_income') or 0,
                 egg_income=request.POST.get('egg_income') or 0,
@@ -298,6 +304,7 @@ def daily_diary_view(request):
 
     history = DailyFarmDiary.objects.filter(farmer=request.user).order_by('-date')
     animals = Animal.objects.filter(owner=request.user)
+    groups = AnimalGroup.objects.filter(owner=request.user)
 
     # চার্টের জন্য ডাটা — পুরনো logic ঠিক আছে
     history_asc = list(history.order_by('date'))
@@ -321,8 +328,27 @@ def daily_diary_view(request):
     total_expense = float((totals['tf'] or 0) + (totals['tmed'] or 0) + (totals['to'] or 0))
     net_profit    = total_income - total_expense
 
-    # ── NEW: Individual Animal ROI — পশু ভিত্তিক লাভ-ক্ষতি ──
-    animal_stats = []
+    # ── Group-based ROI — গ্রুপ ভিত্তিক লাভ-ক্ষতি ──
+    category_bn = {'cow': 'গরু', 'goat': 'ছাগল', 'hen': 'মুরগি', 'duck': 'হাঁস'}
+    group_stats = []
+    for g in groups:
+        records = history.filter(group=g)
+        agg_g = records.aggregate(
+            mi=Sum('milk_income'), mt=Sum('meat_income'), ei=Sum('egg_income'),
+            fc=Sum('feed_cost'),   mc=Sum('medicine_cost'), oc=Sum('other_cost')
+        )
+        income  = float((agg_g['mi'] or 0) + (agg_g['mt'] or 0) + (agg_g['ei'] or 0))
+        expense = float((agg_g['fc'] or 0) + (agg_g['mc'] or 0) + (agg_g['oc'] or 0))
+        group_stats.append({
+            'category':     category_bn.get(g.category, g.category),
+            'animal_count': g.animal_count,
+            'income':       income,
+            'expense':      expense,
+            'profit':       income - expense,
+        })
+
+    # ── One-off per-animal entries — একক পশু এন্ট্রি ──
+    oneoff_stats = []
     for animal in animals:
         records = history.filter(animal=animal)
         if records.exists():
@@ -332,28 +358,24 @@ def daily_diary_view(request):
             )
             income  = float((agg_a['mi'] or 0) + (agg_a['mt'] or 0) + (agg_a['ei'] or 0))
             expense = float((agg_a['fc'] or 0) + (agg_a['mc'] or 0) + (agg_a['oc'] or 0))
-            profit  = income - expense
-            category_display = {
-                'cow': 'গরু', 'goat': 'ছাগল', 'hen': 'মুরগি', 'duck': 'হাঁস'
-            }.get(animal.category, animal.category)
-            animal_stats.append({
+            oneoff_stats.append({
                 'tag_id':   animal.tag_id,
-                'category': category_display,
+                'category': category_bn.get(animal.category, animal.category),
                 'income':   income,
                 'expense':  expense,
-                'profit':   profit,
+                'profit':   income - expense,
             })
 
     return render(request, 'dashboards/diary.html', {
-        # পুরনো variables — ঠিক আছে
         'history':        history,
         'animals':        animals,
+        'groups':         groups,
         'chart_dates':    json.dumps(chart_dates),
         'chart_incomes':  json.dumps(chart_incomes),
         'chart_expenses': json.dumps(chart_expenses),
         'pie_data':       json.dumps(pie_data),
-        # NEW variables
-        'animal_stats':   animal_stats,
+        'group_stats':    group_stats,
+        'oneoff_stats':   oneoff_stats,
         'total_income':   total_income,
         'total_expense':  total_expense,
         'net_profit':     net_profit,
@@ -615,9 +637,10 @@ def ai_prediction_view(request):
             f"  {r.date}: আয়=৳{float(r.total_income):,.0f}, ব্যয়=৳{float(r.total_expense):,.0f}, লাভ=৳{float(r.net_profit):,.0f}"
         )
 
-    animal_roi_rows = []
-    for animal in animals:
-        recs = history.filter(animal=animal)
+    group_roi_rows = []
+    category_bn = {'cow': 'গরু', 'goat': 'ছাগল', 'hen': 'মুরগি', 'duck': 'হাঁস'}
+    for grp in AnimalGroup.objects.filter(owner=request.user):
+        recs = history.filter(group=grp)
         if recs.exists():
             agg = recs.aggregate(
                 mi=Sum('milk_income'), mt=Sum('meat_income'), ei=Sum('egg_income'),
@@ -625,8 +648,8 @@ def ai_prediction_view(request):
             )
             inc = float((agg['mi'] or 0)+(agg['mt'] or 0)+(agg['ei'] or 0))
             exp = float((agg['fc'] or 0)+(agg['mc'] or 0)+(agg['oc'] or 0))
-            animal_roi_rows.append(
-                f"  {animal.tag_id}({animal.category}): আয়=৳{inc:,.0f} ব্যয়=৳{exp:,.0f} লাভ=৳{inc-exp:,.0f}"
+            group_roi_rows.append(
+                f"  {category_bn.get(grp.category, grp.category)} গ্রুপ ({grp.animal_count}টি পশু): আয়=৳{inc:,.0f} ব্যয়=৳{exp:,.0f} লাভ=৳{inc-exp:,.0f}"
             )
 
     prediction_raw = None
@@ -649,8 +672,8 @@ def ai_prediction_view(request):
 সাম্প্রতিক ৭টি রেকর্ড:
 {chr(10).join(recent_rows) if recent_rows else "  কোনো রেকর্ড নেই"}
 
-পশু ভিত্তিক ROI:
-{chr(10).join(animal_roi_rows) if animal_roi_rows else "  কোনো পশু নেই"}
+গ্রুপ ভিত্তিক ROI:
+{chr(10).join(group_roi_rows) if group_roi_rows else "  কোনো গ্রুপ নেই"}
 
 নিচের format-এ বাংলায় উত্তর দাও:
 
@@ -690,11 +713,13 @@ def ai_prediction_view(request):
 # --- Animal Analysis (AI + Real Data) ---
 @login_required
 def animal_analysis_view(request):
+    from django.db.models import Q
     animals = Animal.objects.filter(owner=request.user)
     analysis       = None
     selected_animal = None
     user_problem   = ""
     animal_income  = animal_expense = animal_profit = animal_records = 0
+    group_income   = group_expense  = group_profit  = 0
 
     if request.method == "POST":
         animal_id    = request.POST.get("animal_id", "").strip()
@@ -704,7 +729,8 @@ def animal_analysis_view(request):
             selected_animal = Animal.objects.filter(id=animal_id, owner=request.user).first()
 
         if selected_animal and user_problem:
-            # ── Real data collect করা ──
+            from django.db.models import Sum
+            # ── Per-animal one-off entries ──
             diary_records = DailyFarmDiary.objects.filter(
                 farmer=request.user, animal=selected_animal
             ).order_by("-date")
@@ -713,8 +739,6 @@ def animal_analysis_view(request):
                 animal=selected_animal
             ).order_by("-date")
 
-            # Aggregated financial data
-            from django.db.models import Sum
             agg = diary_records.aggregate(
                 mi=Sum("milk_income"), mt=Sum("meat_income"), ei=Sum("egg_income"),
                 fc=Sum("feed_cost"),   mc=Sum("medicine_cost"), oc=Sum("other_cost")
@@ -724,14 +748,26 @@ def animal_analysis_view(request):
             animal_profit  = animal_income - animal_expense
             animal_records = diary_records.count()
 
-            # Recent 5 records for detail
+            # ── Group context for this animal's category ──
+            group_records = DailyFarmDiary.objects.filter(
+                farmer=request.user,
+                group__owner=request.user,
+                group__category=selected_animal.category,
+            )
+            gagg = group_records.aggregate(
+                mi=Sum("milk_income"), mt=Sum("meat_income"), ei=Sum("egg_income"),
+                fc=Sum("feed_cost"),   mc=Sum("medicine_cost"), oc=Sum("other_cost")
+            )
+            group_income  = float((gagg["mi"] or 0)+(gagg["mt"] or 0)+(gagg["ei"] or 0))
+            group_expense = float((gagg["fc"] or 0)+(gagg["mc"] or 0)+(gagg["oc"] or 0))
+            group_profit  = group_income - group_expense
+
             recent_records = []
             for r in diary_records[:5]:
                 recent_records.append(
                     f"  {r.date}: আয়=৳{float(r.total_income):,.0f}, ব্যয়=৳{float(r.total_expense):,.0f}, লাভ=৳{float(r.net_profit):,.0f}"
                 )
 
-            # Vaccination history
             vax_list = [str(v.date) for v in vax_records[:5]]
             vax_info = ", ".join(vax_list) if vax_list else "কোনো রেকর্ড নেই"
 
@@ -739,7 +775,6 @@ def animal_analysis_view(request):
                 selected_animal.category, selected_animal.category
             )
 
-            # ── RAG — knowledge base থেকে relevant তথ্য ──
             rag_results = _search_rag(
                 user_problem,
                 animal_filter=selected_animal.category,
@@ -747,7 +782,6 @@ def animal_analysis_view(request):
             )
             rag_context = _build_rag_context(rag_results)
 
-            # ── AI Prompt ──
             prompt = f"""তুমি একজন অভিজ্ঞ ভেটেরিনারি ডাক্তার এবং কৃষি অর্থনীতিবিদ।
 নিচের RAG knowledge base থেকে প্রাসঙ্গিক তথ্য ব্যবহার করো:{rag_context}
 নিচে একটি পশুর real database থেকে নেওয়া তথ্য দেওয়া আছে। এই তথ্যের ভিত্তিতে কৃষকের প্রশ্নের উত্তর দাও।
@@ -758,11 +792,16 @@ def animal_analysis_view(request):
 জাত        : {selected_animal.breed or "অজানা"}
 শেষ ভ্যাকসিন: {selected_animal.last_vaccination_date or "দেওয়া হয়নি"}
 
-═══ আর্থিক রেকর্ড (সব সময়ের) ═══
+═══ এই পশুর একক রেকর্ড (one-off entries) ═══
 মোট আয়     : ৳{animal_income:,.0f}
 মোট ব্যয়    : ৳{animal_expense:,.0f}
 নিট লাভ     : ৳{animal_profit:,.0f}
 মোট রেকর্ড  : {animal_records} টি
+
+═══ {category_bn} গ্রুপের সামগ্রিক হিসাব (এই পশু সেই গ্রুপের অন্তর্ভুক্ত) ═══
+মোট আয়     : ৳{group_income:,.0f}
+মোট ব্যয়    : ৳{group_expense:,.0f}
+নিট লাভ     : ৳{group_profit:,.0f}
 
 ═══ সাম্প্রতিক ৫টি রেকর্ড ═══
 {chr(10).join(recent_records) if recent_records else "  কোনো রেকর্ড নেই"}
@@ -783,7 +822,7 @@ def animal_analysis_view(request):
 [এখনই কী করতে হবে, ধাপে ধাপে]
 
 💰 আর্থিক বিশ্লেষণ:
-[এই পশুটি লাভজনক কিনা, data দেখে মন্তব্য করো]
+[গ্রুপ ও একক হিসাব দেখে মন্তব্য করো]
 
 📈 পরবর্তী মাসের পূর্বাভাস:
 [বর্তমান trend দেখে আগামী মাস কেমন যাবে]
@@ -807,6 +846,9 @@ def animal_analysis_view(request):
         "animal_expense":  animal_expense,
         "animal_profit":   animal_profit,
         "animal_records":  animal_records,
+        "group_income":    group_income,
+        "group_expense":   group_expense,
+        "group_profit":    group_profit,
     })
 
 
